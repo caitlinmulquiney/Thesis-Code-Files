@@ -1,0 +1,19 @@
+clear all;
+close all;
+% clc;
+
+%{b} is defined with origin at free surface, below mastfoot
+
+
+% Preliminary computations to come close to equilibrium
+tspan = [0,20];
+U0 = 21.19; % boat speed
+beta0 = 1.2*pi/180; % boat drift angle
+eta0 = [0;0;-1.6;4.5*pi/180;2.3*pi/180;-0.03*pi/180]; % boat attitude
+nu0 = [Rbn(eta0).'* [U0*cos(beta0);U0*sin(beta0);0.81]; zeros(3,1)]; % boat velocity in {b}
+eta0int = [0;0;0;0;0;0];
+
+Fo = [eta0; nu0; eta0int]
+options = odeset('RelTol',1e-2);
+[t, F] = ode45(@SystemPID, tspan, Fo, options);
+plotErrorSignal(t, F(:,1:6), F(:,7:12))

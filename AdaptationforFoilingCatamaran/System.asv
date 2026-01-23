@@ -1,0 +1,21 @@
+function [t, F] = System(t, v)
+% clc;
+
+%{b} is defined with origin at free surface, below mastfoot
+
+
+% Preliminary computations to come close to equilibrium
+
+
+totalLoad = zeros(6,1);
+for idxFoil=1:length(foil)
+    totalLoad = totalLoad + foilLoad(eta0,nu0,foil{idxFoil},wind,wave,true);
+end
+totalLoad= totalLoad + weightLoad(eta0,true);
+totalLoad = totalLoad + aerodynamicLoadSuperstructure(eta0,nu0,wind,true);
+M = massDistribTrimaran(verbose);
+C = coriolisCentripetal(M,nu);
+
+vdot = M^(-1)*(totalLoad - C*v);
+F = [F]
+return
