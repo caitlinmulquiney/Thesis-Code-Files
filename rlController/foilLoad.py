@@ -7,11 +7,10 @@ def foilLoad(eta, nu, foil, wind, wave):
     - eta and nu (Fossen notation)
     - foil: dict from loadFoilDescription()
     - wind, wave: dict-like objects (only wind used for now)
-    - verbose: boolean
     """
 
-    # Densities [kg/m^3]
-    rho_air = 1.0
+    # Densities [kg/m**3]
+    rho_air = 1.225
     rho_water = 1025.0
 
     # --------------------------------------------------

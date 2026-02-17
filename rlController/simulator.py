@@ -1,5 +1,5 @@
 import numpy as np
-from System import system_dynamics           # your converted MATLAB System()
+from System import system
 from massDistribTrimaran import massDistribTrimaran
 from foilLoad import foilLoad
 from weightLoad import weightLoad
@@ -48,7 +48,12 @@ class HydrofoilSimulator:
         action : np.array
             Control inputs from PPO
         """
-        self.state = rk4_step(self.state, action, self.dt)
+        try:
+            self.state = rk4_step(self.state, action, self.dt)
+        except Exception as e:
+            print(f"Simulation error: {e}")
+            return self.reset()
+        
         return self.state.copy()
 
 
@@ -56,8 +61,8 @@ class HydrofoilSimulator:
 # RK4 Integrator
 # ===============================
 def rk4_step(state, action, dt):
-    k1 = system_dynamics(state, action)
-    k2 = system_dynamics(state + 0.5 * dt * k1, action)
-    k3 = system_dynamics(state + 0.5 * dt * k2, action)
-    k4 = system_dynamics(state + dt * k3, action)
+    k1 = system(state, action)
+    k2 = system(state + 0.5 * dt * k1, action)
+    k3 = system(state + 0.5 * dt * k2, action)
+    k4 = system(state + dt * k3, action)
     return state + (dt / 6.0) * (k1 + 2*k2 + 2*k3 + k4)

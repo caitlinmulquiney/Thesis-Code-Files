@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def mass_distrib_trimaran():
+def massDistribTrimaran():
     """
     Rough estimation of the inertia properties of a sailing trimaran.
     Reference point is below mast, at deck level.
@@ -13,7 +13,7 @@ def mass_distrib_trimaran():
     mtot = (2.3e3 + 87.5 * 6)
 
     # Center of gravity (COG)
-    xG = 5.92896
+    xG = 0
     yG = 0.07904
     zG = -3.86752
 

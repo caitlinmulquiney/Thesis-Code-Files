@@ -1,4 +1,6 @@
 import numpy as np
+from weightLoad import weightLoad
+from aerodynamicLoadSuperstructure import aerodynamicLoadSuperstructure
 from foilLoad import foilLoad
 
 def computeResidual(x, eta, nu, foil, wind):

@@ -1,5 +1,7 @@
 import numpy as np
 
+from skewSym import skewSym
+
 def coriolisCentripetal(M, nu):
     """
     Computes the Coriolis-centripetal matrix C

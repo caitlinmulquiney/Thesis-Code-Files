@@ -8,8 +8,9 @@ model = PPO(
     env,
     verbose=1,
     learning_rate=3e-4,
+    tensorboard_log="./ppo_hydrofoil_tensorboard/"
 )
 
-model.learn(total_timesteps=500_000)
+model.learn(total_timesteps=100_000)
 
 model.save("ppo_hydrofoil")

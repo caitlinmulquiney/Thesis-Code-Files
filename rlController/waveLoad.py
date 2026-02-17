@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def wave_mechanics(t, area, H, T, d, L, z, y):
+def waveLoad(t, area, H, T, d, L, z, y):
     """
     Linear wave pressure force.
 

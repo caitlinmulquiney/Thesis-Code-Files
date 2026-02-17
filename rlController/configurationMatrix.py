@@ -22,7 +22,7 @@ def configurationMatrix(foil, eta, nu, wind, wave):
 
         # Rudders: control is yaw (f3)
         # MATLAB: foil 5 and 7
-        if foil_idx in [4, 6]:
+        if foil_idx == 4 or foil_idx == 6:
             dFoilAngle = np.array([0.0, 0.0, du])
         else:
             # Other foils: control is pitch (f2)

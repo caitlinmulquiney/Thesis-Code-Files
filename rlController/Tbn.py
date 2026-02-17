@@ -11,9 +11,9 @@ def Tbn(eta):
 
     phi = eta[3]
     theta = eta[4]
-    if abs(theta) > np.deg2rad(60):
-        terminated = True
-
+    
+    # Clamp theta to prevent gimbal lock (keep away from ±90°)
+    theta = np.clip(theta, -np.deg2rad(80), np.deg2rad(80))
 
     cphi = np.cos(phi)
     sphi = np.sin(phi)
