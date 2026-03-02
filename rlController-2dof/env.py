@@ -9,7 +9,7 @@ class HydrofoilEnv(gym.Env):
     def __init__(self):
         super().__init__()
 
-        self.sim = HydrofoilSimulator(dt=0.5)
+        self.sim = HydrofoilSimulator(dt=0.05,  wind_file="wind170528.txt")
 
         self.observation_space = spaces.Box(
             low=np.array([
@@ -42,14 +42,16 @@ class HydrofoilEnv(gym.Env):
         )
 
         self.action_space = spaces.Box(
-            low=np.array([-1.0, -1.0]),
-            high=np.array([1.0, 1.0]),
+            low=np.array([-1.0, -1.0, -1.0]),
+            high=np.array([1.0, 1.0, 1.0]),
             dtype=np.float32
         )
 
         self.target_height = -1.3
+        self.last_action = np.zeros(3)
 
     def reset(self, seed=None, options=None):
+        self.last_action = np.zeros(3)
         state = self.sim.reset()
         return self._get_obs(state), {}
 
@@ -59,50 +61,56 @@ class HydrofoilEnv(gym.Env):
         # Check for NaN or inf in state
         if not np.all(np.isfinite(state)):
             print("WARNING: State contains NaN or inf values!")
-            print(f"State: {state}")
-            # Reset to safe state
-            state = self.sim.reset()
-            return self._get_obs(state).astype(np.float32), -1.0, True, False, {}
+            print(f"State: {self._get_obs(state)}")
+            return self._get_obs(state), -10.0, True, False, {}
 
-        if np.any(np.abs(self._get_obs(state)) > 1e4):
+        if np.any(np.abs(self._get_obs(state)) > 1e6):
             print(f"OVERFLOW WARNING - state values: {state}")
             print(f"Max value at index: {np.argmax(np.abs(self._get_obs(state)))}")
-            state = self.sim.reset()
-            return self._get_obs(state), -500.0, True, False, {}
-        # Reward function - stabilized to prevent NaN
-        height = state[2]  # z-position (negative when submerged)
+            return self._get_obs(state), -10.0, True, False, {}
+
+        height = state[2]
         pitch = state[4]
+        roll = state[3]
         heave_velocity = state[8] 
-        pitch_rate = state[9]  # check your index
+        pitch_rate = state[10]
 
-        # Target: height around -1.3 (from reset), pitch near 0
-        target_height = -1.3
-        target_pitch = 0.5 * np.pi / 180  # Allow small positive pitch
-        
-        # Height reward: penalize deviation from target height
-        height_error = height - target_height
-        pitch_error = state[4] - target_pitch
+        target_height = -1.3 # permissable range from 0.1 to -2.5
+        target_pitch = 0.5 * np.pi / 180 # permissable range -5/10 to 5/10 deg
+        target_roll = 2.6 * np.pi / 180
+    
+        height_error = height - target_height 
+        roll_error = roll - target_roll
+        pitch_error = pitch - target_pitch
+        action_error = action - self.last_action
+        smoothness_penalty = 0 #-0.5 * np.sum(np.square(action_error))
 
-        height_reward = 1-5*(height_error ** 2)
+        height_reward = 2-5.0 * height_error**2
+        pitch_reward = 1-50 * pitch_error**2
+        roll_reward = 1-50 * roll_error**2
 
         pitch_rate_penalty = 0 #-1.0 * (pitch_rate**2)
+        control_penalty = 0 #-0.5*np.sum(np.square(action))
 
-        reward = height_reward+ pitch_rate_penalty
+        #print(height_reward, pitch_reward, roll_reward)
+        reward = height_reward + pitch_reward + roll_reward
 
         terminated = False
         truncated = False
 
-        # Terminate if pitch angle gets too large
-        if abs(pitch) > np.deg2rad(80):
-            terminated = True
+        self.last_action = action.copy()
 
-        # Terminate if boat dips too low
-        if height > 0.1:
-            terminated = True
+        if abs(pitch) > np.deg2rad(20):
+            print(f"Pitch exceeds maximum value: {state[4]}")
+            return self._get_obs(state), -10.0, True, False, {}
+        
+        if abs(roll) > np.deg2rad(20):
+            print(f"Roll exceeds maximum value: {state[3]}")
+            return self._get_obs(state), -10.0, True, False, {}
 
-        # Terminate if boat raises too high
-        if height < -2.4:
-            terminated = True
+        if height < -2.4 or height > 0.1:
+            print(f"Height exceeds maximum value: {state[2]}")
+            return self._get_obs(state), -10.0, True, False, {}
 
         return self._get_obs(state), float(reward), terminated, truncated, {}
 

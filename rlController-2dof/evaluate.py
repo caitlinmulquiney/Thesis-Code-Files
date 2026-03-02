@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from stable_baselines3.common.vec_env import VecNormalize, DummyVecEnv
+from model import drawBoat, initalise
 
 # Load
 eval_env = DummyVecEnv([lambda: HydrofoilEnv()])
@@ -20,7 +21,8 @@ for episode in range(num_episodes):
     done = False
     total_reward = 0
     steps = 0
-    
+    initalise()
+
     print(f"\n--- Episode {episode + 1} ---")
     
     fig, ax = plt.subplots()

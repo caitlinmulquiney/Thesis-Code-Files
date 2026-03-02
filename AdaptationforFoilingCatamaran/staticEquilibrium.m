@@ -51,7 +51,7 @@ foil{6}.attitudeInB = foil{6}.attitudeInB + [0;sol(3);sol(4)];
 foil{7}.attitudeInB = foil{7}.attitudeInB + [0;0;sol(4)]; 
 
 
-fprintf(1,'Delta_foilAngles = rakeL:%4.1f Starboard Tfoil:%4.1f Port Tfoil:%4.1f Rudder:%4.1f \n',sol.'*180/pi);
+fprintf(1,'Delta_foilAngles = rakeL:%4.4f Starboard Tfoil:%4.4f Port Tfoil:%4.4f Rudder:%4.4f \n',sol.'*180/pi);
 fprintf(1,'---------------------------------------------------------------------------------------------------------------------------------- \n');
 fprintf(1,'#  |       speed      alpha |       lift      drag  |         f1         f2         f3 |         m1         m2         m3 | comment \n');
 fprintf(1,'---------------------------------------------------------------------------------------------------------------------------------- \n');
@@ -73,8 +73,8 @@ loads = [foilForce'; aerodynamic'; weight'];
 foil0 = foil;
 
 % %% Rough sketch showing the hull, the foils, the generated forces + their application point
-% figure('Position',[680 1 1920 961]);
-% drawBoat(eta0,nu0,foil0,wind,wave)
+figure('Position',[680 1 1920 961]);
+drawBoat(eta0,nu0,foil0,wind,wave)
 % 
 % figure('Position',[680 1 1920 961]);
 % t = tiledlayout(1,2);

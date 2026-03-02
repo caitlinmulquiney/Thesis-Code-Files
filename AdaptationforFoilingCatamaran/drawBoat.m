@@ -6,22 +6,23 @@ function drawBoat(eta,nu,foil,wind,wave)
 
 hullLength = 15;
 hullSeparation = 3.744*2; % distance between port and starboard hulls
-COGpositionInB = [5.92896; 0.07904; -3.86752];
-applicationPointAeroLoadSuperstructure = [5.92896;0;-12];
+COGpositionInB = [0; 0.07904; -3.86752];
+% applicationPointAeroLoadSuperstructure = [5.92896;0;-12];
+applicationPointAeroLoadSuperstructure = [0;0;-12];
 scalingForces = .4;
 
 % Rotation matrix
 R = Rbn(eta);
 
 % Draw starboard hull
-p1 = eta(1:3) + R*[hullLength; hullSeparation/2; 0];
-p2 = eta(1:3) + R*[0; hullSeparation/2; 0];
+p1 = eta(1:3) + R*[hullLength-5.75; hullSeparation/2; 0];
+p2 = eta(1:3) + R*[0-5.75; hullSeparation/2; 0];
 plot3([p1(1) p2(1)], [p1(2) p2(2)], [p1(3) p2(3)], 'r', 'LineWidth', 3);
 hold on;
 
 % Draw port hull
-p1 = eta(1:3) + R*[hullLength; -hullSeparation/2; 0];
-p2 = eta(1:3) + R*[0; -hullSeparation/2; 0];
+p1 = eta(1:3) + R*[hullLength-5.75; -hullSeparation/2; 0];
+p2 = eta(1:3) + R*[0-5.75; -hullSeparation/2; 0];
 plot3([p1(1) p2(1)], [p1(2) p2(2)], [p1(3) p2(3)], 'r', 'LineWidth', 3);
 
 % Draw foils and their forces

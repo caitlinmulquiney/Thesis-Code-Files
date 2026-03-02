@@ -7,7 +7,7 @@ function foilLoadInB = foilLoad(eta,nu,foil,wind,wave,verbose)  %#ok<INUSL>
 % - a boolean "verbose" to print details or not
 
 % Densities [kg/m^3]
-rho_air=1;
+rho_air=1.225;
 rho_water=1025;
 
 % First of all, check whether we are in air, in water, or partially

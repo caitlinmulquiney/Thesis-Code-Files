@@ -57,6 +57,10 @@ def system(foil_list, state, wind=None, wave=None):
 
     nud = np.linalg.solve(M, total_load - C @ nu)
 
+    nud[0] = 0.0  # surge
+    nud[1] = 0.0  # sway
+    nud[5] = 0.0  # yaw
+
     eta_dot = Jbn(eta) @ nu
 
     dstate = np.concatenate((eta_dot, nud))
@@ -74,19 +78,21 @@ def update_foil_list(action):
     # action[0] = pitch control (foils 1, 3, 5)
     # action[1] = yaw control (foils 4, 6)
     if action is None:
-        action = np.array([0.0, 0.0])
+        action = np.array([0.0, 0.0, 0.0])
 
-    pitch = action[0] * np.deg2rad(10.0)
-    yaw = action[1] * np.deg2rad(10.0)
+    pitchLfoil = action[0] * np.deg2rad(10.0)
+    pitchTfoilP = action[1] * np.deg2rad(10.0)
+    pitchTfoilS = action[2] * np.deg2rad(10.0)
 
     foil_list = loadFoilDescription()  # Load the original foil list
     for idx, foil in enumerate(foil_list):
-        # Rudders (indices 4, 6): control is yaw (element 2)
-        if idx == 4 or idx == 6:
-            foil["attitudeInB"][2] = foil["attitudeInB"][2] + yaw
-
-        # Other foils (indices 1, 3, 5): control is pitch (element 1)
-        elif idx == 1 or idx == 3 or idx == 5:
-            foil["attitudeInB"][1] = foil["attitudeInB"][1] + pitch
+        if idx == 1:
+            foil["attitudeInB"][1] = foil["attitudeInB"][1] + pitchLfoil
+        
+        elif idx == 3:
+            foil["attitudeInB"][1] = foil["attitudeInB"][1] + pitchTfoilS
+        
+        elif idx == 5:
+            foil["attitudeInB"][1] = foil["attitudeInB"][1] + pitchTfoilP
 
     return foil_list

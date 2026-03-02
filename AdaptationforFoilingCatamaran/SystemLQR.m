@@ -17,6 +17,10 @@ nuD = [0; 0; 0; 0];
 if t >= 50
     wind.speedInN = 6.17;
 end
+
+if t >= 100
+    wind.speedInN = 8.17;
+end
 etadot = Jbn(eta0)*nu0;
 e = etaD - eta0(3:6);
 e_dot = nuD - nu0(3:6); %nuD - nu0(3:6)

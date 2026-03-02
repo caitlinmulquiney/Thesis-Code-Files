@@ -12,8 +12,8 @@ rho_water=1025;
 
 % First of all, check whether we are in air, in water, or partially
 % submerged
-foilEnd1Position = eta(1:3) + Rbn(eta)*(foil.positionInB + Rbn([zeros(3,1);foil.attitudeInB])*[0;-foil.span/2;0]);
-foilEnd2Position = eta(1:3) + Rbn(eta)*(foil.positionInB + Rbn([zeros(3,1);foil.attitudeInB])*[0;foil.span/2;0]);
+foilEnd1Position = eta(1:3) + Rbn(eta)*(foil.positionInB + Rbn([zeros(3,1);foil.attitudeInB])*[0;-foil.span/2;0])
+foilEnd2Position = eta(1:3) + Rbn(eta)*(foil.positionInB + Rbn([zeros(3,1);foil.attitudeInB])*[0;foil.span/2;0])
 Dplus = max([foilEnd1Position(3) foilEnd2Position(3)]);
 Dminus = min([foilEnd1Position(3) foilEnd2Position(3)]);
 if sign(Dplus)~=sign(Dminus)
@@ -71,9 +71,9 @@ foilForceInB = Rbn([zeros(3,1);foil.attitudeInB]) * foilForceInF;
 foilLoadInB = [foilForceInB; cross(foil.positionInB,foilForceInB)];
 
 % Display if asked to
-% if verbose
-%     fprintf(1,'f  |  %10.1f %10.1f | %10.1f %10.1f | %+10.1f %+10.1f %+10.1f | %+10.1f %+10.1f %+10.1f | %s (%s)',...
-%         foilRelativeSpeed,abs(foilAngleOfAttack)*180/pi,abs(lift)/1e3,abs(drag)/1e3,foilLoadInB.'/1000,foil.type,foilStatus)
-%     fprintf('\n')
+if verbose
+    fprintf(1,'f  |  %10.1f %10.1f | %10.1f %10.1f | %+10.1f %+10.1f %+10.1f | %+10.1f %+10.1f %+10.1f | %s (%s)',...
+        foilRelativeSpeed,abs(foilAngleOfAttack)*180/pi,abs(lift)/1e3,abs(drag)/1e3,foilLoadInB.'/1000,foil.type,foilStatus)
+    fprintf('\n')
 end
 

@@ -10,27 +10,36 @@ from coriolisCentripetal import coriolisCentripetal
 from Jbn import Jbn
 from Tbn import Tbn
 from Rbn import Rbn                           # import Rbn from your file
+from model import drawBoat
 
 class HydrofoilSimulator:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
-    def __init__(self, dt=0.05):
+    def __init__(self, dt=0.05, wind_file = None):
         """
         RL-friendly hydrofoil simulator
         dt : float
             Simulation time step (s)
         """
         self.dt = dt
+        self.wind_index = 0
         self.state = None
         self.foil_list = loadFoilDescription()
+        self.wind_index = 0
+        
+        if wind_file is not None:
+            self.wind_speeds = np.loadtxt(wind_file)  # 1D array of speeds
+        else:
+            self.wind_speeds = None
 
     def reset(self):
         """
         Reset the environment to initial equilibrium
         """
+        self.wind_index = 0
         U0 = 16.18  # Boat speed
         beta0 = 1.3 * np.pi / 180  # Boat drift angle
 
         eta0 = np.array([
-            0, 0, -1.3,
+            0, 0, -1,
             2.6 * np.pi / 180,
             -0.5 * np.pi / 180,
             -0.8 * np.pi / 180
@@ -44,28 +53,43 @@ class HydrofoilSimulator:
 
         self.state = np.concatenate((eta0, nu0))
         self.foil_list = loadFoilDescription()  
+
+        self.state[2] += np.random.uniform(-0.5, 0.5)
+        self.state[4] += np.random.uniform(-0.02, 0.02)
         return self.state.copy()
+
+    def get_wind(self):
+        if self.wind_speeds is None:
+            return {"speedInN": 9.231, "direction": 30 * np.pi / 180}
+        
+        idx = self.wind_index % len(self.wind_speeds)
+        speed = self.wind_speeds[idx]
+        self.wind_index += 1
+        
+        return {"speedInN": speed, "direction": 30 * np.pi / 180}
 
     def step(self, action):
         self.foil_list = update_foil_list(action)
-        result = rk4_step(self.state, self.foil_list, self.dt)
+        wind = self.get_wind()
+        result = rk4_step(self.state, self.foil_list, self.dt, wind=wind)
         
         if result is None:
-            self.state = self._initial_state()  # reset state properly
+            self.state = self.reset()  # reset state properly
             return self.state.copy()
         
         self.state = result
+        drawBoat(np.array([0,0,self.state[2],self.state[3], self.state[4], 0]), self.foil_list, wind)
         return self.state.copy()
 
 
 # ===============================
 # RK4 Integrator
 # ===============================
-def rk4_step(state, foil_list, dt):
-    k1 = system(foil_list, state)
-    k2 = system(foil_list, state + 0.5*dt*k1)
-    k3 = system(foil_list, state + 0.5*dt*k2)
-    k4 = system(foil_list, state + dt*k3)
+def rk4_step(state, foil_list, dt, wind=None):
+    k1 = system(foil_list, state, wind)
+    k2 = system(foil_list, state + 0.5*dt*k1, wind)
+    k3 = system(foil_list, state + 0.5*dt*k2, wind)
+    k4 = system(foil_list, state + dt*k3, wind)
     state = state + dt/6 * (k1 + 2*k2 + 2*k3 + k4)
 
     if not np.all(np.isfinite(state)):

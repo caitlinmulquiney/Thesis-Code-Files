@@ -6,8 +6,8 @@ function M = massDistribTrimaran(verbose)
 % Total mass
 mtot = (2.3e3 + 87.5*6 ) ;
 % Position of COG (see assumptions)
-xG = 5.92896;
-yG = 0.07904;
+xG = 0;
+yG = 0;
 zG = -3.86752;
 % Moment of inertia in roll
 Ixx_cog = 129000;
