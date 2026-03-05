@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from stable_baselines3.common.vec_env import VecNormalize, DummyVecEnv
-from model import drawBoat, initalise
 
 # Load
 eval_env = DummyVecEnv([lambda: HydrofoilEnv()])
@@ -12,7 +11,7 @@ eval_env = VecNormalize.load("vecnormalize_stats.pkl", eval_env)
 eval_env.training = False
 eval_env.norm_reward = False
 
-model = PPO.load("ppo_hydrofoil")
+model = PPO.load("ppoDirRange_hydrofoil")
 
 # Run evaluation episodes
 num_episodes = 5
@@ -21,7 +20,6 @@ for episode in range(num_episodes):
     done = False
     total_reward = 0
     steps = 0
-    initalise()
 
     print(f"\n--- Episode {episode + 1} ---")
     
@@ -47,6 +45,7 @@ for episode in range(num_episodes):
         pitch = np.rad2deg(raw_obs[0][2])
 
         print(f"Step {steps}: Height={height:.3f}, Pitch={pitch:.2f}°, Actions={action}")
+        done = terminated[0]
     
     print(f"Episode {episode + 1} finished - Steps: {steps}, Total Reward: {total_reward:.4f}")
 

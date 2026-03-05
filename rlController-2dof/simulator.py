@@ -10,7 +10,7 @@ from coriolisCentripetal import coriolisCentripetal
 from Jbn import Jbn
 from Tbn import Tbn
 from Rbn import Rbn                           # import Rbn from your file
-from model import drawBoat
+from model import Boat
 
 class HydrofoilSimulator:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
     def __init__(self, dt=0.05, wind_file = None):
@@ -24,6 +24,8 @@ class HydrofoilSimulator:
         self.state = None
         self.foil_list = loadFoilDescription()
         self.wind_index = 0
+        self.steps = 0
+        self.boat_model = Boat()
         
         if wind_file is not None:
             self.wind_speeds = np.loadtxt(wind_file)  # 1D array of speeds
@@ -34,12 +36,14 @@ class HydrofoilSimulator:
         """
         Reset the environment to initial equilibrium
         """
+        # self.steps = 0
         self.wind_index = 0
+        wind = self.get_wind()
         U0 = 16.18  # Boat speed
         beta0 = 1.3 * np.pi / 180  # Boat drift angle
 
         eta0 = np.array([
-            0, 0, -1,
+            0, 0, -1.3,
             2.6 * np.pi / 180,
             -0.5 * np.pi / 180,
             -0.8 * np.pi / 180
@@ -56,6 +60,7 @@ class HydrofoilSimulator:
 
         self.state[2] += np.random.uniform(-0.5, 0.5)
         self.state[4] += np.random.uniform(-0.02, 0.02)
+        self.boat_model.drawBoat(np.array([0,0,self.state[2],self.state[3], self.state[4], 0]), self.foil_list, wind)
         return self.state.copy()
 
     def get_wind(self):
@@ -65,8 +70,9 @@ class HydrofoilSimulator:
         idx = self.wind_index % len(self.wind_speeds)
         speed = self.wind_speeds[idx]
         self.wind_index += 1
+        direction = np.random.uniform(30*np.pi/180, 60*np.pi/180)
         
-        return {"speedInN": speed, "direction": 30 * np.pi / 180}
+        return {"speedInN": speed, "direction": direction}
 
     def step(self, action):
         self.foil_list = update_foil_list(action)
@@ -78,7 +84,9 @@ class HydrofoilSimulator:
             return self.state.copy()
         
         self.state = result
-        drawBoat(np.array([0,0,self.state[2],self.state[3], self.state[4], 0]), self.foil_list, wind)
+        if self.steps % 20 == 0: 
+            self.boat_model.updateBoat(np.array([0,0,self.state[2],self.state[3], self.state[4], 0]), self.foil_list, wind)
+        self.steps += 1
         return self.state.copy()
 
 

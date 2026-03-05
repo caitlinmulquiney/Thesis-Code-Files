@@ -42,16 +42,16 @@ class HydrofoilEnv(gym.Env):
         )
 
         self.action_space = spaces.Box(
-            low=np.array([-1.0, -1.0, -1.0]),
-            high=np.array([1.0, 1.0, 1.0]),
+            low=np.array([-1.0, -1.0, -1.0, -1.0]),
+            high=np.array([1.0, 1.0, 1.0, 0]),
             dtype=np.float32
         )
 
         self.target_height = -1.3
-        self.last_action = np.zeros(3)
+        self.last_action = np.zeros(4)
 
     def reset(self, seed=None, options=None):
-        self.last_action = np.zeros(3)
+        self.last_action = np.zeros(4)
         state = self.sim.reset()
         return self._get_obs(state), {}
 

@@ -51,6 +51,13 @@ p1 = eta(1:3) + R*COGpositionInB ;
 p2 = eta(1:3) + R*COGpositionInB + scalingForces * 1e-3 * (R * weightIndividualLoad(1:3));
 plot3([p1(1) p2(1)],[p1(2) p2(2)],[p1(3) p2(3)],'r  ');
 
+% Draw wind direction arrow
+windScale = 5;
+windDir = wind.direction;
+windVec = windScale * [cos(windDir); sin(windDir); 0];
+quiver3(10, 10, 10 , windVec(1), windVec(2), windVec(3), ...
+        'k', 'LineWidth', 2, 'MaxHeadSize', 0.5);
+
 %Draw aerodynamic load on superstructure
 aeroLoadInB = aerodynamicLoadSuperstructure(eta,nu,wind,false);
 p1 = eta(1:3) + R*applicationPointAeroLoadSuperstructure;

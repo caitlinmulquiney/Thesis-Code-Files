@@ -14,7 +14,7 @@ eta0 = [0;0;-1.6;5*pi/180;2*pi/180;0]; % boat attitude
 nu0 = [Rbn(eta0).'* [U0*cos(beta0);U0*sin(beta0);0]; zeros(3,1)]; % boat velocity in {b}
 
 wind.speedInN = 10; % wind speed in m/s
-wind.direction = 60*pi/180; %(propagation direction, positive=wind from port side) 60deg= "-120" in classical terms
+wind.direction = -60*pi/180; %(propagation direction, positive=wind from port side) 60deg= "-120" in classical terms
 wave=[]; % no waves for now, but it will come
 
 % Now, sum up foil loads, weight and aerodynamic load on superstucture.
@@ -35,7 +35,7 @@ fprintf(1,'T  |                                                | %+10.1f %+10.1f
 % 
 % % Rough sketch showing the hull, the foils, the generated forces + their application point
 figure('Position',[680 1 1920 961]);
-drawBoat(eta0,nu0,foil,wind,wave)
+drawBoat(eta0,nu0,foil,wind,wave)   
 
 % %% Adjust the foils to come closer to equilibrium
 % 

@@ -6,7 +6,7 @@ obs, _ = env.reset()
 
 print("Testing stability with zero action changes (constant baseline foil angles)...")
 for step in range(200):
-    action = np.array([0.0, 0.0])
+    action = np.array([0.0, 0.0, 0.0, 0.0])
     obs, reward, terminated, truncated, info = env.step(action)
     
     height = obs[2]
