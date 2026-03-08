@@ -72,7 +72,7 @@ class HydrofoilEnv(gym.Env):
         height = state[2]
         pitch = state[4]
         roll = state[3]
-        heave_velocity = state[8] 
+        roll_rate = state[9]
         pitch_rate = state[10]
 
         target_height = -1.3 # permissable range from 0.1 to -2.5
@@ -82,18 +82,16 @@ class HydrofoilEnv(gym.Env):
         height_error = height - target_height 
         roll_error = roll - target_roll
         pitch_error = pitch - target_pitch
-        action_error = action - self.last_action
-        smoothness_penalty = 0 #-0.5 * np.sum(np.square(action_error))
+        roll_rate_error = roll_rate
+        pitch_rate_error = pitch_rate
 
-        height_reward = 2-5.0 * height_error**2
+        height_reward = 2.5-5.0 * height_error**2
         pitch_reward = 1-50 * pitch_error**2
         roll_reward = 1-50 * roll_error**2
+        roll_rate_reward = 1-50*roll_rate_error**2
+        pitch_rate_reward = 1-50*pitch_rate_error**2
 
-        pitch_rate_penalty = 0 #-1.0 * (pitch_rate**2)
-        control_penalty = 0 #-0.5*np.sum(np.square(action))
-
-        #print(height_reward, pitch_reward, roll_reward)
-        reward = height_reward + pitch_reward + roll_reward
+        reward = height_reward + pitch_reward + roll_reward + roll_rate_reward
 
         terminated = False
         truncated = False
@@ -108,7 +106,7 @@ class HydrofoilEnv(gym.Env):
             print(f"Roll exceeds maximum value: {state[3]}")
             return self._get_obs(state), -10.0, True, False, {}
 
-        if height < -2.4 or height > 0.1:
+        if height < -2 or height > 0.1:
             print(f"Height exceeds maximum value: {state[2]}")
             return self._get_obs(state), -10.0, True, False, {}
 

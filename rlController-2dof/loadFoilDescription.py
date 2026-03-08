@@ -27,13 +27,14 @@ def loadFoilDescription():
         "positionInB": np.array([-1.3, -10*np.sin(np.deg2rad(5)), -10.62]),
         "attitudeInB": np.array([-85, 0, -20]) * np.pi/180,
         "chord": 13,
-        "span": 22
+        "span": 22,
+        "beta": 10
     }
 
     # %% L foil on the starboard floater (horizontal part)
     foil_2 = {
         "type": "starboard L foil horizontal part",
-        "positionInB": np.array([1.85,3.2,2.6-0.935]),
+        "positionInB": np.array([1.85,3.2,2]),
         # Paper numbers
         # Real numbers were: [-5+20;3.3;0] * pi/180
         "attitudeInB": np.array([0, 4.5, 0]) * np.pi/180,

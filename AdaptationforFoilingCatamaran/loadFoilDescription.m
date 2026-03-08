@@ -30,7 +30,7 @@ foil{1}.span = 22;
 %% L foil on the starboard floater
 % Terminology: rake (longitudinal variations) and cant (lateral variation)
 foil{2}.type = 'starboard L foil horizontal part';
-foil{2}.positionInB = [1.85;3.2;2.6-0.935];
+foil{2}.positionInB = [1.85;3.2;2];
 %foil{2}.attitudeInB = [-5+20;3.5;0]*pi/180; % Real numbers
 foil{2}.attitudeInB = [0;4.5;0]*pi/180; % Paper numbers
 foil{2}.chord = 0.4;

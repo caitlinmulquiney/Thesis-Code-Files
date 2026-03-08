@@ -116,21 +116,34 @@ def foilLoad(eta, nu, foil, wind, wave):
     # --------------------------------------------------
     
     if foilStatus == "inAir":
+        if abs(aoa_deg) < 28:
+            liftCoeff = -1e-6 * abs(aoa_deg)**2 + 0.0927 * abs(aoa_deg) + 0.0099
+        else:
+            liftCoeff = -0.0175 * abs(aoa_deg) + 3.0
+
+        dragCoeff = 0.7 * (
+            0.00006 * abs(aoa_deg)**2 - 0.0014 * abs(aoa_deg) + 0.0097
+        )
+        liftCoeff = 0.1*foil["beta"] + 0.1*abs(aoa_deg)
+        dragCoeff = (0.0007+0.00012*foil["beta"])*aoa_deg**2
+    
+        if aoa_deg < 0:
+            liftCoeff = -liftCoeff
+            dragCoeff = -dragCoeff
         lift = 0.5 * rho_air * liftCoeff * foilRelativeSpeed**2 * foil["chord"] * foil["span"]
         drag = 0.5 * rho_air * dragCoeff * foilRelativeSpeed**2 * foil["chord"] * foil["span"]
     else:
         # Free Surface Effect
-        
         if foil["type"] in ("starboard T foil", "port T foil", "starboard L foil horizontal part"):
             center_pos =  (eta[0:3]
-            + Rbn(eta)
-            @ (
-                foil["positionInB"]
+                + Rbn(eta)
+                @ (
+                    foil["positionInB"]
+                )
             )
-        )
             height_chord_ratio = center_pos[2]/foil["chord"]
-            Lift_fs = np.minimum(1.0,0.5*np.log(height_chord_ratio+0.1)+0.75)
-            Drag_fs = np.minimum(1.0,0.5*np.log(height_chord_ratio+0.1)+0.9)
+            Lift_fs = np.minimum(1.0,0.5*np.log10(height_chord_ratio+0.1)+0.75)
+            Drag_fs = np.minimum(1.0,0.5*np.log10(height_chord_ratio+0.1)+0.9)
         else:
             Lift_fs = 1.0
             Drag_fs = 1.0

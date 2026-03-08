@@ -25,7 +25,7 @@ class HydrofoilSimulator:
         self.foil_list = loadFoilDescription()
         self.wind_index = 0
         self.steps = 0
-        self.boat_model = Boat()
+        # self.boat_model = Boat()
         
         if wind_file is not None:
             self.wind_speeds = np.loadtxt(wind_file)  # 1D array of speeds
@@ -60,7 +60,7 @@ class HydrofoilSimulator:
 
         self.state[2] += np.random.uniform(-0.5, 0.5)
         self.state[4] += np.random.uniform(-0.02, 0.02)
-        self.boat_model.drawBoat(np.array([0,0,self.state[2],self.state[3], self.state[4], 0]), self.foil_list, wind)
+        # self.boat_model.drawBoat(np.array([0,0,self.state[2],self.state[3], self.state[4], 0]), self.foil_list, wind)
         return self.state.copy()
 
     def get_wind(self):
@@ -84,9 +84,9 @@ class HydrofoilSimulator:
             return self.state.copy()
         
         self.state = result
-        if self.steps % 20 == 0: 
-            self.boat_model.updateBoat(np.array([0,0,self.state[2],self.state[3], self.state[4], 0]), self.foil_list, wind)
-        self.steps += 1
+        # if self.steps % 20 == 0: 
+        #     self.boat_model.updateBoat(np.array([0,0,self.state[2],self.state[3], self.state[4], self.state[5]]), self.foil_list, wind)
+        # self.steps += 1
         return self.state.copy()
 
 

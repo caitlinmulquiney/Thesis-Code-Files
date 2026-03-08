@@ -59,7 +59,7 @@ def system(foil_list, state, wind=None, wave=None):
 
     nud[0] = 0.0  # surge
     nud[1] = 0.0  # sway
-    nud[5] = 0.0  # yaw
+    nud[5] = 0.0
 
     eta_dot = Jbn(eta) @ nu
 

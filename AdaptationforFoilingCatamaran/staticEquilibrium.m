@@ -10,7 +10,7 @@ close all;
 U0 = 16.18; % boat speed
 beta0 = 1.3*pi/180; % boat drift angle
 %eta0 = [0;0;-1.3;2.6*pi/180;-0.5*pi/180;-0.8*pi/180]; % boat attitude
-eta0 = [0;0;-1.3;2.6*pi/180;-0.5*pi/180;-0.7*pi/180]; % boat attitude paper numbers
+eta0 = [0;0;-1.4;2.6*pi/180;-0.5*pi/180;-0.7*pi/180]; % boat attitude paper numbers
 nu0 = [Rbn(eta0).'* [U0*cos(beta0);U0*sin(beta0);0]; zeros(3,1)]; % boat velocity in {b}
 
 wind.speedInN = 9.231; % wind speed in m/s

@@ -5,12 +5,13 @@ env = HydrofoilEnv()
 obs, _ = env.reset()
 
 print("Testing stability with zero action changes (constant baseline foil angles)...")
-for step in range(200):
+print(obs)
+for step in range(1):
     action = np.array([0.0, 0.0, 0.0, 0.0])
     obs, reward, terminated, truncated, info = env.step(action)
     
-    height = obs[2]
-    pitch = obs[4] * 180 / np.pi
+    height = obs[0]
+    pitch = obs[2] * 180 / np.pi
     u_speed = obs[6]
     print(f"Step {step}: height={height:.3f}, pitch={pitch:.2f}°, u={u_speed:.2f}")
     
