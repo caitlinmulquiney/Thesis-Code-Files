@@ -14,7 +14,7 @@ eta0 = [0;0;-1.3;2.6*pi/180;-0.5*pi/180;0*pi/180]; % boat attitude paper numbers
 nu0 = [Rbn(eta0).'* [U0*cos(beta0);U0*sin(beta0);0]; zeros(3,1)]; % boat velocity in {b}
 
 wind.speedInN = 9.231; % wind speed in m/s
-wind.direction = 135*pi/180; %(propagation direction, positive=wind from port side) 60deg= "-120" in classical terms
+wind.direction = 90*pi/180; %(propagation direction, positive=wind from port side) 60deg= "-120" in classical terms
 wave=[]; % no waves for now, but it will come
 
 % Now, sum up foil loads, weight and aerodynamic load on superstucture.
@@ -41,7 +41,7 @@ fprintf(1,'T  |                                                | %+10.1f %+10.1f
 %% Adjust the foils to come closer to equilibrium
 
 options = optimset('MaxFunEvals',1e8,'TolFun',1e-10,'MaxIter',1e8);
-[sol,val] = fminsearch(@(x)computeResidual(x,eta0,nu0,foil,wind),[0;0;0;0;0;0],options); %L foil, starboard rudder foil, port rudder foil, rudders
+[sol,val] = fminsearch(@(x)computeResidual(x,eta0,nu0,foil,wind),[0;0;0;0;0],options); %L foil, starboard rudder foil, port rudder foil, rudders
 
 foil{1}.attitudeInB = foil{1}.attitudeInB + [0;0;sol(5)];
 foil{1}.beta = foil{1}.beta + sol(1);

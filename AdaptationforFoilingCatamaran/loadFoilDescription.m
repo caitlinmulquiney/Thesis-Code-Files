@@ -27,6 +27,8 @@ foil{1}.attitudeInB = [-90;0;-20]*pi/180;
 foil{1}.chord = 6;
 foil{1}.span = 22;
 foil{1}.beta = -10*pi/180;
+foil{1}.twist = 4*pi/180;
+foil{1}.twist_exponent = 1.3;
 
 %% L foil on the starboard floater
 % Terminology: rake (longitudinal variations) and cant (lateral variation)
