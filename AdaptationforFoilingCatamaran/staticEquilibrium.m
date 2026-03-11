@@ -8,18 +8,18 @@ close all;
 
 % Preliminary computations to come close to equilibrium
 U0 = 16.18; % boat speed
-beta0 = 1.3*pi/180; % boat drift angle
+beta0 = 1.2*pi/180; % boat drift angle
 %eta0 = [0;0;-1.3;2.6*pi/180;-0.5*pi/180;-0.8*pi/180]; % boat attitude
-eta0 = [0;0;-1.4;2.6*pi/180;-0.5*pi/180;-0.7*pi/180]; % boat attitude paper numbers
+eta0 = [0;0;-1.3;2.6*pi/180;-0.5*pi/180;0*pi/180]; % boat attitude paper numbers
 nu0 = [Rbn(eta0).'* [U0*cos(beta0);U0*sin(beta0);0]; zeros(3,1)]; % boat velocity in {b}
 
 wind.speedInN = 9.231; % wind speed in m/s
-wind.direction = 30*pi/180; %(propagation direction, positive=wind from port side) 60deg= "-120" in classical terms
+wind.direction = 135*pi/180; %(propagation direction, positive=wind from port side) 60deg= "-120" in classical terms
 wave=[]; % no waves for now, but it will come
 
 % Now, sum up foil loads, weight and aerodynamic load on superstucture.
 foil=loadFoilDescription;
-fprintf(1,'Initial values: U=%g beta=%g sinkage=%g heel=%g trim=%g\n',U0,beta0*180/pi,eta0(3),eta0(4)*180/pi,eta0(5)*180/pi);
+fprintf(1,'Initial values: U=%g beta=%g sinkage=%g heel=%g trim=%g wind direction =%g \n',U0,beta0*180/pi,eta0(3),eta0(4)*180/pi,eta0(5)*180/pi, wind.direction*180/pi);
 fprintf(1,'---------------------------------------------------------------------------------------------------------------------------------- \n');
 fprintf(1,'#  |       speed      alpha |       lift      drag  |         f1         f2         f3 |         m1         m2         m3 | comment \n');
 fprintf(1,'---------------------------------------------------------------------------------------------------------------------------------- \n');
@@ -41,10 +41,12 @@ fprintf(1,'T  |                                                | %+10.1f %+10.1f
 %% Adjust the foils to come closer to equilibrium
 
 options = optimset('MaxFunEvals',1e8,'TolFun',1e-10,'MaxIter',1e8);
-[sol,val] = fminsearch(@(x)computeResidual(x,eta0,nu0,foil,wind),[0;0;0;0],options); %L foil, starboard rudder foil, port rudder foil, rudders
+[sol,val] = fminsearch(@(x)computeResidual(x,eta0,nu0,foil,wind),[0;0;0;0;0;0],options); %L foil, starboard rudder foil, port rudder foil, rudders
 
-foil{2}.attitudeInB = foil{2}.attitudeInB + [0;sol(1);0];
-foil{3}.attitudeInB = foil{3}.attitudeInB + [0;sol(1);0];
+foil{1}.attitudeInB = foil{1}.attitudeInB + [0;0;sol(5)];
+foil{1}.beta = foil{1}.beta + sol(1);
+foil{2}.attitudeInB = foil{2}.attitudeInB + [0;0;0];
+foil{3}.attitudeInB = foil{3}.attitudeInB + [0;0;0];
 foil{4}.attitudeInB = foil{4}.attitudeInB + [0;sol(2);sol(4)]; 
 foil{5}.attitudeInB = foil{5}.attitudeInB + [0;0;sol(4)]; 
 foil{6}.attitudeInB = foil{6}.attitudeInB + [0;sol(3);sol(4)]; 

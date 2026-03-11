@@ -2,10 +2,11 @@ function residual = computeResidual(x,eta,nu,foil,wind)
 % eta = [0;0;x(3);x(4);x(5);0];
 % nu = [[x(1)*cos(x(2));x(1)*sin(x(2));0]; zeros(3,1)];
 % nu = [Rbn(eta).'* [x(1)*cos(x(2));x(1)*sin(x(2));0]; zeros(3,1)];
-
+foil{1}.attitudeInB = foil{1}.attitudeInB + [0;0;x(5)];
+foil{1}.beta = foil{1}.beta + x(1);
 % Adjust L foil
-foil{2}.attitudeInB = foil{2}.attitudeInB + [0;x(1);0];
-foil{3}.attitudeInB = foil{3}.attitudeInB + [0;x(1);0];
+foil{2}.attitudeInB = foil{2}.attitudeInB + [0;0;0];
+foil{3}.attitudeInB = foil{3}.attitudeInB + [0;0;0];
 
 % Adjust Starboard T foil
 foil{4}.attitudeInB = foil{4}.attitudeInB + [0;x(2);x(4)]; 
