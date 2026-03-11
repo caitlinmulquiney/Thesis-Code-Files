@@ -76,20 +76,28 @@ class Boat:
             if "sail" in ftype:
                 foilColor = color.green
                 Rfoil = Rbn(np.hstack((np.zeros(3), foilAtt)))
+                Rfoilbeta = Rbn(np.hstack((np.zeros(3), 0, foil["beta"], 0)))
                 mastBase = np.array([1.3, 0, 0])
                 mastBaseW = to_world(mastBase)
-                sailBase = to_world(mastBase + Rfoil @ np.array([-4.5, 0, 0]))
+                sailBase1 = to_world(mastBase + Rfoil @ np.array([-2.5, 0, 0]))
                 mastTop = to_world(mastBase + Rfoil @ np.array([0, 22.5, 0]))
-                sailTop = to_world(mastBase + Rfoil @ np.array([-2.7, 22.5, 0]))
+                sailTop1 = to_world(mastBase + Rfoil @ np.array([-2.5, 22.5, 0]))
+                sailBase2 = to_world(mastBase + Rfoil @ (np.array([-2.5, 0, 0]) + Rfoilbeta @ np.array([-2, 0, 0])))
+                sailTop2 = to_world(mastBase + Rfoil @ (np.array([-2.5, 22.5, 0]) + Rfoilbeta @ np.array([-2, 0, 0])))
                 jibBase = np.array([hullLength - 2.7 - 5.75, 0, 0])
                 jibBaseFore = to_world(jibBase)
                 jibBaseAft = to_world(jibBase + Rfoil @ np.array([-4.65, 0, 0]))
                 sailJibTop = to_world(jibBase + Rfoil @ np.array([-4.65, 13.6, 0]))
                 self.objects["main_v1"] = vertex(pos=vector(*mastBaseW), color=foilColor)
-                self.objects["main_v2"] = vertex(pos=vector(*sailBase), color=foilColor)
+                self.objects["main_v2"] = vertex(pos=vector(*sailBase1), color=foilColor)
                 self.objects["main_v3"] = vertex(pos=vector(*mastTop), color=foilColor)
-                self.objects["main_v4"] = vertex(pos=vector(*sailTop), color=foilColor)
-                self.objects["main"] = quad(vs = [self.objects["main_v1"], self.objects["main_v3"], self.objects["main_v4"], self.objects["main_v2"]])
+                self.objects["main_v4"] = vertex(pos=vector(*sailTop1), color=foilColor)
+                self.objects["main_s1"] = quad(vs = [self.objects["main_v1"], self.objects["main_v3"], self.objects["main_v4"], self.objects["main_v2"]])
+                self.objects["main_v5"] = vertex(pos=vector(*sailBase1), color=color.cyan)
+                self.objects["main_v6"] = vertex(pos=vector(*sailBase2), color=color.cyan)
+                self.objects["main_v7"] = vertex(pos=vector(*sailTop1), color=color.cyan)
+                self.objects["main_v8"] = vertex(pos=vector(*sailTop2), color=color.cyan)
+                self.objects["main_s2"] = quad(vs = [self.objects["main_v5"], self.objects["main_v7"], self.objects["main_v8"], self.objects["main_v6"]])
                 self.objects["jib_v1"] = vertex(pos=vector(*jibBaseFore), color=foilColor)
                 self.objects["jib_v2"]  = vertex(pos=vector(*sailJibTop), color=foilColor)
                 self.objects["jib_v3"]  = vertex(pos=vector(*jibBaseAft), color=foilColor)
@@ -247,7 +255,7 @@ if __name__ == "__main__":
 
     foils = loadFoilDescription()
 
-    wind = {"speedInN": 9.231, "direction": 30 * np.pi / 180}
+    wind = {"speedInN": 9.231, "direction": 30* np.pi / 180}
     boat.drawBoat(eta, foils, wind)
 
     while True:

@@ -90,18 +90,15 @@ def foilLoad(eta, nu, foil, wind, wave):
     aoa_deg = foilAngleOfAttack * 180 / np.pi
 
     if foil["type"] == "sail":
-        if abs(aoa_deg) < 28:
-            liftCoeff = -1e-6 * abs(aoa_deg)**2 + 0.0927 * abs(aoa_deg) + 0.0099
-        else:
-            liftCoeff = -0.0175 * abs(aoa_deg) + 3.0
-
-        dragCoeff = 0.7 * (
-            0.00006 * abs(aoa_deg)**2 - 0.0014 * abs(aoa_deg) + 0.0097
-        )
+        # beta can be between 0 and 15 deg
+        # alpha can be between 0 and 10 deg - will stall after
+        
+        liftCoeff = 0.1*abs(foil.get("beta", 0)) + 0.1*abs(aoa_deg)
+        dragCoeff = (0.0007+0.00012*abs(foil.get("beta", 0)))*aoa_deg**2
     
-        if aoa_deg < 0:
-            liftCoeff = -liftCoeff
-            dragCoeff = -dragCoeff
+        if abs(aoa_deg) > (14-0.4*abs(foil.get("beta", 0))):
+            liftCoeff = 5 - 0.3*abs(aoa_deg)
+        
     else:
         if (aoa_deg > 15):
             aoa_deg = 15
@@ -110,26 +107,14 @@ def foilLoad(eta, nu, foil, wind, wave):
             aoa_deg = -15
             
         liftCoeff = 0.1083 * aoa_deg - 0.0002
-        dragCoeff = 6e-05 * aoa_deg**2 + 5e-07 * aoa_deg + 0.0051
+        dragCoeff = 6e-05 * aoa_deg**2 + 5e-07 * abs(aoa_deg) + 0.0051
+
+    if aoa_deg < 0:
+        liftCoeff = -liftCoeff
     # --------------------------------------------------
     # Lift and drag forces
     # --------------------------------------------------
-    
     if foilStatus == "inAir":
-        if abs(aoa_deg) < 28:
-            liftCoeff = -1e-6 * abs(aoa_deg)**2 + 0.0927 * abs(aoa_deg) + 0.0099
-        else:
-            liftCoeff = -0.0175 * abs(aoa_deg) + 3.0
-
-        dragCoeff = 0.7 * (
-            0.00006 * abs(aoa_deg)**2 - 0.0014 * abs(aoa_deg) + 0.0097
-        )
-        liftCoeff = 0.1*foil["beta"] + 0.1*abs(aoa_deg)
-        dragCoeff = (0.0007+0.00012*foil["beta"])*aoa_deg**2
-    
-        if aoa_deg < 0:
-            liftCoeff = -liftCoeff
-            dragCoeff = -dragCoeff
         lift = 0.5 * rho_air * liftCoeff * foilRelativeSpeed**2 * foil["chord"] * foil["span"]
         drag = 0.5 * rho_air * dragCoeff * foilRelativeSpeed**2 * foil["chord"] * foil["span"]
     else:

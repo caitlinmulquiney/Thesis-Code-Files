@@ -42,16 +42,16 @@ class HydrofoilEnv(gym.Env):
         )
 
         self.action_space = spaces.Box(
-            low=np.array([-1.0, -1.0, -1.0, -1.0]),
-            high=np.array([1.0, 1.0, 1.0, 0]),
+            low=np.array([-1.0, -1.0, -1.0, -1.0, -1.0]),
+            high=np.array([1.0, 1.0, 1.0, 1.0, 1.0]),
             dtype=np.float32
         )
 
         self.target_height = -1.3
-        self.last_action = np.zeros(4)
+        self.last_action = np.zeros(5)
 
     def reset(self, seed=None, options=None):
-        self.last_action = np.zeros(4)
+        self.last_action = np.zeros(5)
         state = self.sim.reset()
         return self._get_obs(state), {}
 
@@ -90,8 +90,11 @@ class HydrofoilEnv(gym.Env):
         roll_reward = 1-50 * roll_error**2
         roll_rate_reward = 1-50*roll_rate_error**2
         pitch_rate_reward = 1-50*pitch_rate_error**2
+        sail_trim_penalty = 0
+        if np.sign(action[3]) != np.sign(action[4]):
+            sail_trim_penalty = -20
 
-        reward = height_reward + pitch_reward + roll_reward + roll_rate_reward
+        reward = height_reward + pitch_reward + roll_reward + roll_rate_reward + sail_trim_penalty
 
         terminated = False
         truncated = False
