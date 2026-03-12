@@ -260,8 +260,8 @@ if __name__ == "__main__":
 
     while True:
         rate(30)
-        # foils[0]["attitudeInB"][2] += 1*np.pi/180
-        # boat.updateBoat(eta, foils, wind)
+        foils[0]["attitudeInB"][1] += 1*np.pi/180
+        boat.updateBoat(eta, foils, wind)
 
         # Dummy motion example
         #eta[3] += 0.01  # roll oscillation

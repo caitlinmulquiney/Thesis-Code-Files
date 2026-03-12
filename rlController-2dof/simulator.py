@@ -46,7 +46,7 @@ class HydrofoilSimulator:
             0, 0, -1.3,
             2.6 * np.pi / 180,
             -0.5 * np.pi / 180,
-            -0.8 * np.pi / 180
+            0 * np.pi / 180
         ])  # boat attitude
 
         vel_nav = np.array([U0 * np.cos(beta0),
@@ -70,7 +70,7 @@ class HydrofoilSimulator:
         idx = self.wind_index % len(self.wind_speeds)
         speed = self.wind_speeds[idx]
         self.wind_index += 1
-        direction = np.random.uniform(30*np.pi/180, 60*np.pi/180)
+        direction = np.random.uniform(45*np.pi/180, 50*np.pi/180)
         
         return {"speedInN": speed, "direction": direction}
 
@@ -80,14 +80,13 @@ class HydrofoilSimulator:
         result = rk4_step(self.state, self.foil_list, self.dt, wind=wind)
         
         if result is None:
-            self.state = self.reset()  # reset state properly
-            return self.state.copy()
+            return self.state.copy(), True
         
         self.state = result
         # if self.steps % 20 == 0: 
         #     self.boat_model.updateBoat(np.array([0,0,self.state[2],self.state[3], self.state[4], self.state[5]]), self.foil_list, wind)
         # self.steps += 1
-        return self.state.copy()
+        return self.state.copy(), False
 
 
 # ===============================

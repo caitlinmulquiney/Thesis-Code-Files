@@ -29,6 +29,8 @@ def loadFoilDescription():
         "chord": 6,
         "span": 22,
         "beta": -10 * np.pi/180,
+        "twist": 4 * np.pi/180,
+        "twist_exponent": 1.3
     }
 
     # %% L foil on the starboard floater (horizontal part)

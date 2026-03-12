@@ -25,6 +25,7 @@ else
         sigma = 1;
     else
         foilStatus = 'inAir';
+        sigma = 0;
     end
 end
 

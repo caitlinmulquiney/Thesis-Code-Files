@@ -11,7 +11,7 @@ wave=[]; % no waves for now, but it will come
 
 %% Controller 2
 J = configurationMatrix(foil,eta0,nu0,wind,wave);
-etaD =[-1.3;2.6*pi/180;-0.5*pi/180;-0.8*pi/180];
+etaD =[-1.3;2.6*pi/180;-0.5*pi/180;0*pi/180];
 nuD = [0; 0; 0; 0];
 
 if t >= 50
@@ -34,9 +34,11 @@ F = [etadot; Fdot(7:12)];
 
 %% System Logic
 %saturate actuator angles (radians)
-u = max([ -10; -10; -10; -10; -10]*pi/180, ...
-    min([  10; 10; 10; 10; 10]*pi/180, u));
-
+u = max([ -15; -15; -15; -10; -10; -10; -10; -10]*pi/180, ...
+    min([  15; 15; 15; 10; 10; 10; 10; 10]*pi/180, u));
+% u(1) = 0;
+% u(2) = 0;
+% u(3) = 0;
 % totalLoad = zeros(6,1);
 % 
 % foil{2}.attitudeInB = foil{2}.attitudeInB + [0; u(1); 0];
@@ -57,23 +59,42 @@ u = max([ -10; -10; -10; -10; -10]*pi/180, ...
 % totalLoad= totalLoad + weightLoad(eta0,false);
 % totalLoad = totalLoad + aerodynamicLoadSuperstructure(eta0,nu0,wind,false);
 
-foilList = [2 4 5 6 7];
-otherFoilList = [1 3];
+foilList = [1 2 3 4 5 6 7];
 
-%u = [ 0; 0; 0; 0;5*pi/180;];
 totalLoad = zeros(6,1);
-for idx = 1:length(foilList)
-    if foilList(idx) == 5 || foilList(idx) == 7
-        dFoilAngle = [0;0;u(idx)]; %for this foil (rudder), the control input is the "yaw" of the foil
-    else 
-        dFoilAngle = [0;u(idx);0]; %for the other ones, it is the "pitch"
-    end
-    foil{foilList(idx)}.attitudeInB = foil{foilList(idx)}.attitudeInB + dFoilAngle;
-    totalLoad = totalLoad + foilLoad(eta0,nu0,foil{foilList(idx)},wind,wave,verbose);
-end
 
-for idx = 1:length(otherFoilList)
-    totalLoad = totalLoad + foilLoad(eta0,nu0,foil{otherFoilList(idx)},wind,wave,verbose);
+%% --- Apply control inputs ---
+
+% u(1) : sail sheet (yaw)
+% u(2) : sail camber (beta)
+% u(3) : sail twist
+% u(4) : port foil pitch
+% u(5) : starboard foil pitch
+% u(6) : rudder yaw (foil 5)
+% u(7) : rudder yaw (foil 7)
+% u(8) : stabilizer pitch (foil 6)
+
+% Sail (foil 1)
+foil{1}.attitudeInB = foil{1}.attitudeInB + [0;0;u(1)];
+foil{1}.beta        = foil{1}.beta + u(2);
+foil{1}.twist       = foil{1}.twist + u(3);
+
+% Port foil (foil 2)
+foil{2}.attitudeInB = foil{2}.attitudeInB + [0;u(4);0];
+
+% Starboard foil (foil 4)
+foil{4}.attitudeInB = foil{4}.attitudeInB + [0;u(5);0];
+
+% Rudder foils
+foil{5}.attitudeInB = foil{5}.attitudeInB + [0;0;u(6)];
+foil{7}.attitudeInB = foil{7}.attitudeInB + [0;0;u(7)];
+
+% Stabilizer foil
+foil{6}.attitudeInB = foil{6}.attitudeInB + [0;u(8);0];
+
+%% --- Compute loads from controlled foils ---
+for idx = 1:length(foilList)
+    totalLoad = totalLoad + foilLoad(eta0,nu0,foil{foilList(idx)},wind,wave,verbose);
 end
 
 totalLoad= totalLoad + weightLoad(eta0,verbose);
