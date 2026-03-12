@@ -99,8 +99,13 @@ else
     if strcmp(foil.type, "starboard T foil") || strcmp(foil.type, "port T foil") || strcmp(foil.type, "starboard L foil horizontal part")
         center_pos =  eta(1:3) + Rbn(eta)*foil.positionInB;
         height_chord_ratio = center_pos(3)/foil.chord;
-        Lift_fs = min(1.0,0.5*log10(height_chord_ratio+0.1)+0.75);
-        Drag_fs = min(1.0,0.5*log10(height_chord_ratio+0.1)+0.9);
+        if (center_pos(3) > 0)
+            Lift_fs = min(1.0,0.5*log10(height_chord_ratio+0.1)+0.75);
+            Drag_fs = min(1.0,0.5*log10(height_chord_ratio+0.1)+0.9);
+        else
+            Lift_fs = 0;
+            Drag_fs = 0;
+        end
     else
         Lift_fs = 1.0;
         Drag_fs = 1.0;
@@ -116,7 +121,7 @@ foilForceInB = Rbn([zeros(3,1);foil.attitudeInB]) * foilForceInF;
 if strcmp(foil.type, 'sail')
     coe_height = foil.span - foil.span/foil.twist_exponent;
     if foil.twist_exponent < 0
-        coe_height = foil.twist_exponent;
+        coe_height = foil.span/foil.twist_exponent;
     end
     foilLoadInB = [foilForceInB; cross([foil.positionInB(1); foil.positionInB(2); -coe_height], foilForceInB)];
 

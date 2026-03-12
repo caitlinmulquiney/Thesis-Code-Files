@@ -6,7 +6,7 @@ nu0 = F(7:12);
 verbose = false;
 wind.speedInN = 9.231; % wind speed in m/s
 
-wind.direction = 30*pi/180; %(propagation direction, positive=wind from port side) 60deg= "-120" in classical terms
+wind.direction = 45*pi/180; %(propagation direction, positive=wind from port side) 60deg= "-120" in classical terms
 wave=[]; % no waves for now, but it will come
 
 %% Controller 2
