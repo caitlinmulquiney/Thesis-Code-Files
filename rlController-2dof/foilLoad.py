@@ -92,61 +92,35 @@ def foilLoad(eta, nu, foil, wind, wave):
     if foil["type"] == "sail":
         n_sections = 10
         s = np.linspace(0, 1, n_sections)
-        local_aoa_deg = aoa_deg - foil.get("twist", 0) * 180.0 / np.pi * s ** foil.get("twist_exponent", 1)
-        lift_total = 0.0
-        drag_total = 0.0
+        local_aoa_deg = aoa_deg - foil["twist"] * (180/np.pi) * s**foil["twist_exponent"]
         ds = foil["span"] / (n_sections - 1)
+        beta_deg = foil["beta"] * (180/np.pi)
 
-        for i in range(n_sections):
-            aoa_i = local_aoa_deg[i]
-            beta_deg = foil.get("beta", 0) * 180.0 / np.pi
+        # Lift coeff only correct if aoa and beta are the same !!!
+        liftCoeff = 0.1*abs(beta_deg) + 1.5*np.tanh(0.09 * local_aoa_deg)
+        dragCoeff = (0.0007 + 0.00001 * beta_deg**2) * local_aoa_deg**2
 
-            liftCoeff_i = (0.1 * abs(beta_deg) + 0.1 * abs(aoa_i)) / 2.0
-            dragCoeff_i = (0.0007 + 0.00012 * abs(beta_deg)) * aoa_i ** 2
+        dL = 0.5 * rho_air * liftCoeff * foilRelativeSpeed**2 * foil["chord"] * ds
+        dD = 0.5 * rho_air * dragCoeff * foilRelativeSpeed**2 * foil["chord"] * ds
 
-            # Use local aoa_i for stall check (fix from MATLAB)
-            if abs(aoa_i) > (14 - 0.4 * abs(beta_deg)):
-                liftCoeff_i = 5 - 0.3 * abs(aoa_i)
-
-            if aoa_i < 0:
-                liftCoeff_i = -liftCoeff_i
-
-            dL = 0.5 * rho_air * liftCoeff_i * foilRelativeSpeed ** 2 * foil["chord"] * ds
-            dD = 0.5 * rho_air * dragCoeff_i * foilRelativeSpeed ** 2 * foil["chord"] * ds
-
-            lift_total += dL
-            drag_total += dD
-
-        lift = lift_total
-        drag = drag_total
+        lift = np.sum(dL)
+        drag = np.sum(dD)
 
     else:
-        liftCoeff = 0.09 * aoa_deg - 0.0002
-        dragCoeff = 6e-5 * aoa_deg ** 2 + 5e-7 * abs(aoa_deg) + 0.0051
+        liftCoeff = 1.5 * np.tanh(0.09 * aoa_deg)
+        dragCoeff = 6e-5 * aoa_deg**2 + 5e-7 * aoa_deg + 0.0051
 
-        if abs(aoa_deg) > 15:
-            liftCoeff = max(0, 5 - 0.25 * abs(aoa_deg))
-
-        # Free surface effect
         if foil["type"] in ("starboard T foil", "port T foil", "starboard L foil horizontal part"):
-            center_pos =  eta[0:3] + Rbn(eta) @ foil["positionInB"]
-            height_chord_ratio = center_pos[2]/foil["chord"]
-            if (center_pos[2] > 0):
-                Lift_fs = np.minimum(1.0,0.5*np.log10(height_chord_ratio+0.1)+0.75)
-                Drag_fs = np.minimum(1.0,0.5*np.log10(height_chord_ratio+0.1)+0.9)
-            else:
-                Lift_fs = 0
-                Drag_fs = 0
+            center_pos = eta[:3] + Rbn(eta) @ foil["positionInB"]
+            height_chord_ratio = center_pos[2] / foil["chord"] # index 2, not 3
+            Lift_fs = 1   / (1 + np.exp(-1.5 * height_chord_ratio + 0.8))
+            Drag_fs = 1.2 / (1 + np.exp(-1.6 * height_chord_ratio + 0.4))
         else:
             Lift_fs = 1.0
             Drag_fs = 1.0
 
-        if foilStatus == "inAir":
-            lift = 0.5 * rho_air * liftCoeff * foilRelativeSpeed ** 2 * foil["chord"] * foil["span"] * Lift_fs
-            drag = 0.5 * rho_air * dragCoeff * foilRelativeSpeed ** 2 * foil["chord"] * foil["span"] * Drag_fs
-        else:
-            lift = 0.5 * sigma * rho_water * liftCoeff * foilRelativeSpeed ** 2 * foil["chord"] * foil["span"] * Lift_fs
-            drag = 0.5 * sigma * rho_water * dragCoeff * foilRelativeSpeed ** 2 * foil["chord"] * foil["span"] * Drag_fs
+        lift = 0.5 * sigma * rho_water * liftCoeff * foilRelativeSpeed**2 * foil["chord"] * foil["span"] * Lift_fs
+        drag = 0.5 * sigma * rho_water * dragCoeff * foilRelativeSpeed**2 * foil["chord"] * foil["span"] * Drag_fs
 
     # --------------------------------------------------
     # Convert lift/drag into forces and moments in {b}

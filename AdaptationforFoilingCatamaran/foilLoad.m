@@ -67,17 +67,13 @@ if strcmp(foil.type, 'sail')
         aoa_i = local_aoa_deg(i);
         beta_deg = foil.beta * 180/pi;
         
-        liftCoeff_i = (0.1*abs(beta_deg) + 0.1*abs(aoa_i))/2;
-        dragCoeff_i = (0.0007+0.00012*abs(beta_deg))*abs(aoa_i)^2;
-    
-        if abs(aoa_deg) > (14-0.4*abs(beta_deg))
-           liftCoeff_i = 5 - 0.3*abs(aoa_i);
-        end  
-
-        if aoa_i < 0
-            liftCoeff_i = -liftCoeff_i;
+        % Only works if beta is the same sign as aoa!
+        liftCoeff_i = 0.1*beta_deg+1.5*tanh(0.09*aoa_i);
+        if beta_deg < 0
+            liftCoeff_i = -0.1*beta_deg+1.5*tanh(0.09*aoa_i);
         end
-        
+        dragCoeff_i = (0.0007+0.00001*(beta_deg)^2)*(aoa_i)^2;
+    
         % Section lift and drag
         dL = 0.5 * rho_air * liftCoeff_i * foilRelativeSpeed^2 * foil.chord * ds;
         dD = 0.5 * rho_air * dragCoeff_i * foilRelativeSpeed^2 * foil.chord * ds;
@@ -89,23 +85,15 @@ if strcmp(foil.type, 'sail')
     lift = lift_total;
     drag = drag_total;
 else
-    liftCoeff = 0.09*(aoa_deg) - 0.0002;
-    dragCoeff = 6E-05*(aoa_deg)^2 + 5E-07*abs(aoa_deg) + 0.0051;
-    if (abs(aoa_deg) > 15)
-        liftCoeff = max(0,5-0.25*abs(aoa_deg));
-    end
+    liftCoeff = 1.5*tanh(0.09*aoa_deg);
+    dragCoeff = 6E-05*(aoa_deg)^2 + 5E-07*aoa_deg + 0.0051;
 
     % Free Surface Effect
     if strcmp(foil.type, "starboard T foil") || strcmp(foil.type, "port T foil") || strcmp(foil.type, "starboard L foil horizontal part")
         center_pos =  eta(1:3) + Rbn(eta)*foil.positionInB;
         height_chord_ratio = center_pos(3)/foil.chord;
-        if (center_pos(3) > 0)
-            Lift_fs = min(1.0,0.5*log10(height_chord_ratio+0.1)+0.75);
-            Drag_fs = min(1.0,0.5*log10(height_chord_ratio+0.1)+0.9);
-        else
-            Lift_fs = 0;
-            Drag_fs = 0;
-        end
+        Lift_fs = 1/(1+exp(-1.5*height_chord_ratio+0.8));
+        Drag_fs = 1.2/(1+exp(-1.6*height_chord_ratio+0.4));
     else
         Lift_fs = 1.0;
         Drag_fs = 1.0;
