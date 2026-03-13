@@ -41,7 +41,7 @@ fprintf(1,'T  |                                                | %+10.1f %+10.1f
 %% Adjust the foils to come closer to equilibrium
 
 options = optimset('MaxFunEvals',1e8,'TolFun',1e-10,'MaxIter',1e8);
-%[sol,val] = fminsearch(@(x)computeResidual(x,eta0,nu0,foil,wind),[0;0;0;0;0],options); %L foil, starboard rudder foil, port rudder foil, rudders
+[sol,val] = fminsearch(@(x)computeResidual(x,eta0,nu0,foil,wind),[0;0;0;0;0],options); %L foil, starboard rudder foil, port rudder foil, rudders
 
 foil{1}.attitudeInB = foil{1}.attitudeInB + [0;0;sol(5)];
 foil{1}.beta = foil{1}.beta + sol(1);

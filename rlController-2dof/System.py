@@ -56,11 +56,7 @@ def system(foil_list, state, wind=None, wave=None):
     C = coriolisCentripetal(M, nu)
 
     nud = np.linalg.solve(M, total_load - C @ nu)
-
-    nud[0] = 0.0  # surge
-    nud[1] = 0.0  # sway
-    nud[5] = 0.0
-
+    
     eta_dot = Jbn(eta) @ nu
 
     dstate = np.concatenate((eta_dot, nud))
@@ -78,19 +74,19 @@ def update_foil_list(action):
     # action[0] = pitch control (foils 1, 3, 5)
     # action[1] = yaw control (foils 4, 6)
     if action is None:
-        action = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+        action = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
 
     pitchLfoil = action[0] * np.deg2rad(10.0)
     pitchTfoilP = action[1] * np.deg2rad(10.0)
     pitchTfoilS = action[2] * np.deg2rad(10.0)
-    pitchSail = action[3] * np.deg2rad(90)
-    betaSail = action[4] * np.deg2rad(15)
-    twist = action[5] * np.deg2rad(10)
+    #pitchSail = action[3] * np.deg2rad(90)
+    betaSail = action[3] * np.deg2rad(15)
+    twist = action[4] * np.deg2rad(10)
 
     foil_list = loadFoilDescription()  # Load the original foil list
     for idx, foil in enumerate(foil_list):
         if idx == 0:
-            foil["attitudeInB"][2] += pitchSail
+            #foil["attitudeInB"][2] += pitchSail
             foil["beta"] += betaSail
             foil["twist"] += twist
         if idx == 1:

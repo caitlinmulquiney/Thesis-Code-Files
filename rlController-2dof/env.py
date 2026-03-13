@@ -42,16 +42,16 @@ class HydrofoilEnv(gym.Env):
         )
 
         self.action_space = spaces.Box(
-            low=np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0]),
-            high=np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]),
+            low=np.array([-1.0, -1.0, -1.0, -1.0, -1.0]),
+            high=np.array([1.0, 1.0, 1.0, 1.0, 1.0]),
             dtype=np.float32
         )
 
         self.target_height = -1.3
-        self.last_action = np.zeros(6)
+        self.last_action = np.zeros(5)
 
     def reset(self, seed=None, options=None):
-        self.last_action = np.zeros(6)
+        self.last_action = np.zeros(5)
         state = self.sim.reset()
         return self._get_obs(state), {}
 
@@ -79,7 +79,7 @@ class HydrofoilEnv(gym.Env):
 
         target_height = -1.3 # permissable range from 0.1 to -2.5
         target_pitch = 0.5 * np.pi / 180 # permissable range -5/10 to 5/10 deg
-        target_roll = 2.6 * np.pi / 180
+        target_roll = -1 * np.pi / 180
     
         height_error = height - target_height 
         roll_error = roll - target_roll
@@ -90,19 +90,20 @@ class HydrofoilEnv(gym.Env):
         pitch_reward = 1-50 * pitch_error**2
         roll_reward = 1-50 * roll_error**2
         roll_rate_reward = 1-50*roll_rate_error**2
+        saturation_penalty = -0.1 * np.sum(np.maximum(0, np.abs(action) - 0.8)**2)
 
-        reward = height_reward + pitch_reward + roll_reward + roll_rate_reward
+        reward = height_reward + pitch_reward + roll_reward + roll_rate_reward -0.1 * (height_error**2 + pitch_error**2 + roll_error**2) + saturation_penalty
 
         terminated = False
         truncated = False
 
         self.last_action = action.copy()
 
-        if abs(pitch) > np.deg2rad(20):
+        if abs(pitch) > np.deg2rad(10):
             print(f"Pitch exceeds maximum value: {state[4]}")
             return self._get_obs(state), -10.0, True, False, {}
         
-        if abs(roll) > np.deg2rad(20):
+        if roll < np.deg2rad(-10):
             print(f"Roll exceeds maximum value: {state[3]}")
             return self._get_obs(state), -10.0, True, False, {}
 

@@ -97,7 +97,7 @@ def foilLoad(eta, nu, foil, wind, wave):
         beta_deg = foil["beta"] * (180/np.pi)
 
         # Lift coeff only correct if aoa and beta are the same !!!
-        liftCoeff = 0.1*abs(beta_deg) + 1.5*np.tanh(0.09 * local_aoa_deg)
+        liftCoeff = 0.1*beta_deg + 1.5*np.tanh(0.09 * local_aoa_deg)
         dragCoeff = (0.0007 + 0.00001 * beta_deg**2) * local_aoa_deg**2
 
         dL = 0.5 * rho_air * liftCoeff * foilRelativeSpeed**2 * foil["chord"] * ds

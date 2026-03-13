@@ -188,25 +188,29 @@ class Boat:
             ftype = foil["type"].lower()
             Rfoil = Rbn(np.hstack((np.zeros(3), foilAtt)))
             if "sail" in ftype:
+                Rfoilbeta = Rbn(np.hstack((np.zeros(3), 0, foil["beta"], 0)))
                 mastBase = np.array([1.3, 0, 0])
                 mastBaseW = to_world(mastBase)
-                sailBase = to_world(mastBase + Rfoil @ np.array([-4.5, 0, 0]))
+                sailBase1 = to_world(mastBase + Rfoil @ np.array([-2.5, 0, 0]))
                 mastTop = to_world(mastBase + Rfoil @ np.array([0, 22.5, 0]))
-                sailTop = to_world(mastBase + Rfoil @ np.array([-2.7, 22.5, 0]))
+                sailTop1 = to_world(mastBase + Rfoil @ np.array([-2.5, 22.5, 0]))
+                sailBase2 = to_world(mastBase + Rfoil @ (np.array([-2.5, 0, 0]) + Rfoilbeta @ np.array([-2, 0, 0])))
+                sailTop2 = to_world(mastBase + Rfoil @ (np.array([-2.5, 22.5, 0]) + Rfoilbeta @ np.array([-2, 0, 0])))
                 jibBase = np.array([hullLength - 2.7 - 5.75, 0, 0])
                 jibBaseFore = to_world(jibBase)
                 jibBaseAft = to_world(jibBase + Rfoil @ np.array([-4.65, 0, 0]))
                 sailJibTop = to_world(jibBase + Rfoil @ np.array([-4.65, 13.6, 0]))
                 self.objects["main_v1"].pos = vector(*mastBaseW)
-                self.objects["main_v2"].pos = vector(*sailBase)
+                self.objects["main_v2"].pos = vector(*sailBase1)
                 self.objects["main_v3"].pos = vector(*mastTop)
-                self.objects["main_v4"].pos = vector(*sailTop)
-
+                self.objects["main_v4"].pos = vector(*sailTop1)
+                self.objects["main_v5"].pos = vector(*sailBase1)
+                self.objects["main_v6"].pos = vector(*sailBase2)
+                self.objects["main_v7"].pos = vector(*sailTop1)
+                self.objects["main_v8"].pos = vector(*sailTop2)
                 self.objects["jib_v1"].pos = vector(*jibBaseFore)
                 self.objects["jib_v2"].pos = vector(*sailJibTop)
                 self.objects["jib_v3"].pos = vector(*jibBaseAft)
-
-
             else:
                 foilPos = foil["positionInB"]
                 span = foil["span"]
@@ -260,8 +264,8 @@ if __name__ == "__main__":
 
     while True:
         rate(30)
-        foils[0]["attitudeInB"][1] += 1*np.pi/180
-        boat.updateBoat(eta, foils, wind)
+        # foils[0]["attitudeInB"][1] += 1*np.pi/180
+        # boat.updateBoat(eta, foils, wind)
 
         # Dummy motion example
         #eta[3] += 0.01  # roll oscillation
