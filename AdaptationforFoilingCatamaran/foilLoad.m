@@ -68,10 +68,7 @@ if strcmp(foil.type, 'sail')
         beta_deg = foil.beta * 180/pi;
         
         % Only works if beta is the same sign as aoa!
-        liftCoeff_i = 0.1*beta_deg+1.5*tanh(0.09*aoa_i);
-        if beta_deg < 0
-            liftCoeff_i = -0.1*beta_deg+1.5*tanh(0.09*aoa_i);
-        end
+        liftCoeff_i = 0.1*beta_deg + 1*tanh(0.09 * aoa_i);
         dragCoeff_i = (0.0007+0.00001*(beta_deg)^2)*(aoa_i)^2;
     
         % Section lift and drag

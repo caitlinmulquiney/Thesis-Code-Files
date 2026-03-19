@@ -10,11 +10,11 @@ close all;
 U0 = 16.18; % boat speed
 beta0 = 1.2*pi/180; % boat drift angle
 %eta0 = [0;0;-1.3;2.6*pi/180;-0.5*pi/180;-0.8*pi/180]; % boat attitude
-eta0 = [0;0;-1.3;2.6*pi/180;-0.5*pi/180;0*pi/180]; % boat attitude paper numbers
+eta0 = [0;0;-1.2;0.05;-0.025;0]; % boat attitude paper numbers
 nu0 = [Rbn(eta0).'* [U0*cos(beta0);U0*sin(beta0);0]; zeros(3,1)]; % boat velocity in {b}
 
 wind.speedInN = 9.231; % wind speed in m/s
-wind.direction = 45*pi/180; %(propagation direction, positive=wind from port side) 60deg= "-120" in classical terms
+wind.direction = 60*pi/180; %(propagation direction, positive=wind from port side) 60deg= "-120" in classical terms
 wave=[]; % no waves for now, but it will come
 
 % Now, sum up foil loads, weight and aerodynamic load on superstucture.
@@ -41,16 +41,17 @@ fprintf(1,'T  |                                                | %+10.1f %+10.1f
 %% Adjust the foils to come closer to equilibrium
 
 options = optimset('MaxFunEvals',1e8,'TolFun',1e-10,'MaxIter',1e8);
-[sol,val] = fminsearch(@(x)computeResidual(x,eta0,nu0,foil,wind),[0;0;0;0;0],options); %L foil, starboard rudder foil, port rudder foil, rudders
+[sol,val] = fminsearch(@(x)computeResidual(x,eta0,nu0,foil,wind),[0;0;0;],options); %L foil, starboard rudder foil, port rudder foil, rudders
 
-foil{1}.attitudeInB = foil{1}.attitudeInB + [0;0;sol(5)];
-foil{1}.beta = foil{1}.beta + sol(1);
-foil{2}.attitudeInB = foil{2}.attitudeInB + [0;0;0];
+% foil{1}.twist = foil{1}.twist + sol(4);
+%foil{1}.beta = foil{1}.beta + sol(4);
+% foil{1}.attitudeInB = foil{1}.attitudeInB + [0;0;sol(6)];
+foil{2}.attitudeInB = foil{2}.attitudeInB + [0;sol(1);0];
 foil{3}.attitudeInB = foil{3}.attitudeInB + [0;0;0];
-foil{4}.attitudeInB = foil{4}.attitudeInB + [0;sol(2);sol(4)]; 
-foil{5}.attitudeInB = foil{5}.attitudeInB + [0;0;sol(4)]; 
-foil{6}.attitudeInB = foil{6}.attitudeInB + [0;sol(3);sol(4)]; 
-foil{7}.attitudeInB = foil{7}.attitudeInB + [0;0;sol(4)]; 
+foil{4}.attitudeInB = foil{4}.attitudeInB + [0;sol(2);0]; 
+foil{5}.attitudeInB = foil{5}.attitudeInB + [0;0;0]; 
+foil{6}.attitudeInB = foil{6}.attitudeInB + [0;sol(3);0]; 
+foil{7}.attitudeInB = foil{7}.attitudeInB + [0;0;0]; 
 
 
 fprintf(1,'Delta_foilAngles = rakeL:%4.4f Starboard Tfoil:%4.4f Port Tfoil:%4.4f Rudder:%4.4f \n',sol.'*180/pi);
@@ -143,19 +144,19 @@ foilNames = {'L foil', 'starboard T foil', 'starboard rudder', ...
 % Scale factor
 scalingFactor = 1000 / (180 / pi);
 
-% Plotting Force Components (dF_i/du)
-figure('Position', [680 1 1920 961]);
-bar(J(1:3, :) * scalingFactor, 'grouped');  % Force components are in rows 1 to 3
-set(gca, 'xtick', 1:5, 'xticklabel', {'F_z dF_i/du [kN/deg]', });  % Foil names on x-axis
-xlabel('Force component', 'FontSize', 15);
-title('Effect of Yawing foils', 'FontSize', 15);
-legend(foilNames, 'Location', 'Best', 'FontSize', 12);
-
-% Plotting Moment Components (dM_i/du)
-figure('Position', [680 1 1920 961]);
-bar(J(4:6, :) * scalingFactor, 'grouped');  % Moment components are in rows 4 to 6
-set(gca, 'xtick', 1:5, 'xticklabel', {'M_x', 'M_y', 'M_z'});  % Foil names on x-axis
-xlabel('Moment component', 'FontSize', 15);
-ylabel('dM_i/du [kN/deg]', 'FontSize', 15);
-title('Effect of Pitching Foils', 'FontSize', 15);
-legend(foilNames, 'Location', 'Best', 'FontSize', 12);
+% % Plotting Force Components (dF_i/du)
+% figure('Position', [680 1 1920 961]);
+% bar(J(1:3, :) * scalingFactor, 'grouped');  % Force components are in rows 1 to 3
+% set(gca, 'xtick', 1:5, 'xticklabel', {'F_z dF_i/du [kN/deg]', });  % Foil names on x-axis
+% xlabel('Force component', 'FontSize', 15);
+% title('Effect of Yawing foils', 'FontSize', 15);
+% legend(foilNames, 'Location', 'Best', 'FontSize', 12);
+% 
+% % Plotting Moment Components (dM_i/du)
+% figure('Position', [680 1 1920 961]);
+% bar(J(4:6, :) * scalingFactor, 'grouped');  % Moment components are in rows 4 to 6
+% set(gca, 'xtick', 1:5, 'xticklabel', {'M_x', 'M_y', 'M_z'});  % Foil names on x-axis
+% xlabel('Moment component', 'FontSize', 15);
+% ylabel('dM_i/du [kN/deg]', 'FontSize', 15);
+% title('Effect of Pitching Foils', 'FontSize', 15);
+% legend(foilNames, 'Location', 'Best', 'FontSize', 12);

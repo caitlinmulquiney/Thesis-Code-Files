@@ -107,13 +107,18 @@ class Boat:
             else:
                 foilPos = foil["positionInB"]
                 span = foil["span"]
+                chord = foil["chord"]
                 Rfoil = Rbn(np.hstack((np.zeros(3), foilAtt)))
-                p1 = to_world(foilPos + Rfoil @ np.array([0, -span/2, 0]))
-                p2 = to_world(foilPos + Rfoil @ np.array([0,  span/2, 0]))
+                p1 = to_world(foilPos + Rfoil @ np.array([-chord/2, -span/2, 0]))
+                p2 = to_world(foilPos + Rfoil @ np.array([-chord/2,  span/2, 0]))
+                p3 = to_world(foilPos + Rfoil @ np.array([chord/2, -span/2, 0]))
+                p4 = to_world(foilPos + Rfoil @ np.array([chord/2,  span/2, 0]))
 
-                self.objects[ftype] = curve(pos=[vector(*p1), vector(*p2)],
-                    color=foilColor,
-                    radius=0.07)
+                self.objects[ftype + "_1"] = vertex(pos=vector(*p1), color=foilColor)
+                self.objects[ftype + "_2"] = vertex(pos=vector(*p2), color=foilColor)
+                self.objects[ftype + "_3"] = vertex(pos=vector(*p3), color=foilColor)
+                self.objects[ftype + "_4"] = vertex(pos=vector(*p4), color=foilColor)
+                self.objects[ftype] = quad(vs = [self.objects[ftype + "_1"], self.objects[ftype + "_3"], self.objects[ftype + "_4"], self.objects[ftype + "_2"]])
         
         # -----------------------------
         # Draw wind arrow
@@ -214,12 +219,18 @@ class Boat:
             else:
                 foilPos = foil["positionInB"]
                 span = foil["span"]
-                p1 = to_world(foilPos + Rfoil @ np.array([0, -span/2, 0]))
-                p2 = to_world(foilPos + Rfoil @ np.array([0,  span/2, 0]))
+                chord = foil["chord"]
+                Rfoil = Rbn(np.hstack((np.zeros(3), foilAtt)))
+                p1 = to_world(foilPos + Rfoil @ np.array([-chord/2, -span/2, 0]))
+                p2 = to_world(foilPos + Rfoil @ np.array([-chord/2,  span/2, 0]))
+                p3 = to_world(foilPos + Rfoil @ np.array([chord/2, -span/2, 0]))
+                p4 = to_world(foilPos + Rfoil @ np.array([chord/2,  span/2, 0]))
 
-                self.objects[ftype].modify(0, pos=vector(*p1))
-                self.objects[ftype].modify(1, pos=vector(*p2))
-        
+                self.objects[ftype + "_1"].pos = vector(*p1)
+                self.objects[ftype + "_2"].pos = vector(*p2)
+                self.objects[ftype + "_3"].pos = vector(*p3)
+                self.objects[ftype + "_4"].pos = vector(*p4)
+
         # -----------------------------
         # Draw wind arrow
         # -----------------------------
@@ -254,7 +265,8 @@ class Boat:
 # -----------------------------
 if __name__ == "__main__":
     boat = Boat()
-    eta = np.array([0, 0, -2.5, 0.1, 0.05, 0.0])
+
+    eta = np.array([0, 0, -1.2, 0.05, -0.025, 0.0])
     nu = np.zeros(6)
 
     foils = loadFoilDescription()
@@ -264,7 +276,7 @@ if __name__ == "__main__":
 
     while True:
         rate(30)
-        # foils[0]["attitudeInB"][1] += 1*np.pi/180
+        foils[0]["beta"] += 0.1*np.pi/180
         # boat.updateBoat(eta, foils, wind)
 
         # Dummy motion example

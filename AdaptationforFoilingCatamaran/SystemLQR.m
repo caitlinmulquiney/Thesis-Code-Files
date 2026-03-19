@@ -34,8 +34,8 @@ F = [etadot; Fdot(7:12)];
 
 %% System Logic
 %saturate actuator angles (radians)
-u = max([ -15; -15; -15; -10; -10; -10; -10; -10]*pi/180, ...
-    min([  15; 15; 15; 10; 10; 10; 10; 10]*pi/180, u));
+u = max([ -15; -15; -15; -10; -10; -10]*pi/180, ...
+    min([  15; 15; 15; 10; 10; 10]*pi/180, u));
 % u(1) = 0;
 % u(2) = 0;
 % u(3) = 0;
@@ -75,22 +75,22 @@ totalLoad = zeros(6,1);
 % u(8) : stabilizer pitch (foil 6)
 
 % Sail (foil 1)
-foil{1}.attitudeInB = foil{1}.attitudeInB + [0;0;u(1)];
-foil{1}.beta        = foil{1}.beta + u(2);
-foil{1}.twist       = foil{1}.twist + u(3);
+% foil{1}.attitudeInB = foil{1}.attitudeInB + [0;0;u(1)];
+% foil{1}.beta        = foil{1}.beta + u(2);
+foil{1}.twist       = foil{1}.twist + u(6);
 
 % Port foil (foil 2)
-foil{2}.attitudeInB = foil{2}.attitudeInB + [0;u(4);0];
+foil{2}.attitudeInB = foil{2}.attitudeInB + [0;u(1);0];
 
 % Starboard foil (foil 4)
-foil{4}.attitudeInB = foil{4}.attitudeInB + [0;u(5);0];
+foil{4}.attitudeInB = foil{4}.attitudeInB + [0;u(2);0];
 
 % Rudder foils
-foil{5}.attitudeInB = foil{5}.attitudeInB + [0;0;u(6)];
-foil{7}.attitudeInB = foil{7}.attitudeInB + [0;0;u(7)];
+foil{5}.attitudeInB = foil{5}.attitudeInB + [0;0;u(3)];
+foil{7}.attitudeInB = foil{7}.attitudeInB + [0;0;u(4)];
 
 % Stabilizer foil
-foil{6}.attitudeInB = foil{6}.attitudeInB + [0;u(8);0];
+foil{6}.attitudeInB = foil{6}.attitudeInB + [0;u(5);0];
 
 %% --- Compute loads from controlled foils ---
 for idx = 1:length(foilList)

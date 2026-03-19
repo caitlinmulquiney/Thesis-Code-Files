@@ -28,15 +28,15 @@ def loadFoilDescription():
         "attitudeInB": np.array([-90, 0, -20]) * np.pi/180,
         "chord": 6,
         "span": 22,
-        "beta": -10 * np.pi/180,
-        "twist": 4 * np.pi/180,
+        "beta": -2 * np.pi/180,
+        "twist": -4 * np.pi/180,
         "twist_exponent": 1.3
     }
 
     # %% L foil on the starboard floater (horizontal part)
     foil_2 = {
         "type": "starboard L foil horizontal part",
-        "positionInB": np.array([1.85,3.2,2]),
+        "positionInB": np.array([1.85,3.35,1.95]),
         "attitudeInB": np.array([0, 6, 0]) * np.pi/180,
         "chord": 0.4,
         "span": 2
@@ -46,7 +46,7 @@ def loadFoilDescription():
     foil_3 = {
         "type": "starboard L foil vertical part",
         "positionInB": np.array([1.85, 4.1, 0.935]),
-        "attitudeInB": np.array([90, 6, 0]) * np.pi/180,
+        "attitudeInB": np.array([80, 0, 0]) * np.pi/180,
         "chord": 0.4,
         "span": 2
     }
@@ -62,7 +62,7 @@ def loadFoilDescription():
 
     foil_5 = {
         "type": "starboard rudder",
-        "positionInB": np.array([-5.75, 3.744, 0.96704]),
+        "positionInB": np.array([-5.75, 3.744, 0.95]),
         "attitudeInB": np.array([90, 0, 1.6]) * np.pi/180,
         "chord": 0.2,
         "span": 2.032
@@ -78,7 +78,7 @@ def loadFoilDescription():
 
     foil_7 = {
         "type": "port rudder",
-        "positionInB": np.array([-5.75, -3.744, 0.96704]),
+        "positionInB": np.array([-5.75, -3.744, 0.95]),
         "attitudeInB": np.array([90, 0, 1.6]) * np.pi/180,
         "chord": 0.2,
         "span": 2.032

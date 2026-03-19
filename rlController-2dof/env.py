@@ -47,7 +47,6 @@ class HydrofoilEnv(gym.Env):
             dtype=np.float32
         )
 
-        self.target_height = -1.3
         self.last_action = np.zeros(5)
 
     def reset(self, seed=None, options=None):
@@ -76,6 +75,7 @@ class HydrofoilEnv(gym.Env):
         pitch = state[4]
         roll = state[3]
         roll_rate = state[9]
+        pitch_rate = state[10]
 
         target_height = -1.3 # permissable range from 0.1 to -2.5
         target_pitch = 0.5 * np.pi / 180 # permissable range -5/10 to 5/10 deg
@@ -101,15 +101,15 @@ class HydrofoilEnv(gym.Env):
 
         if abs(pitch) > np.deg2rad(10):
             print(f"Pitch exceeds maximum value: {state[4]}")
-            return self._get_obs(state), -10.0, True, False, {}
+            return self._get_obs(state), -50.0, True, False, {}
         
-        if roll < np.deg2rad(-10):
+        if abs(roll) > np.deg2rad(10):
             print(f"Roll exceeds maximum value: {state[3]}")
-            return self._get_obs(state), -10.0, True, False, {}
+            return self._get_obs(state), -50.0, True, False, {}
 
         if height < -2 or height > 0.1:
             print(f"Height exceeds maximum value: {state[2]}")
-            return self._get_obs(state), -20.0, True, False, {}
+            return self._get_obs(state), -50.0, True, False, {}
 
         return self._get_obs(state), float(reward), terminated, truncated, {}
 

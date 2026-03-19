@@ -11,7 +11,7 @@ eval_env = VecNormalize.load("vecnormalize_stats.pkl", eval_env)
 eval_env.training = False
 eval_env.norm_reward = False
 
-model = PPO.load("ppo_hydrofoil_3dof")
+model = PPO.load("ppo_hydrofoil_3dof_1")
 
 # Run evaluation episodes
 num_episodes = 5
@@ -44,7 +44,7 @@ for episode in range(num_episodes):
         height = raw_obs[0][0]
         pitch = np.rad2deg(raw_obs[0][2])
 
-        print(f"Step {steps}: Height={height:.3f}, Pitch={pitch:.2f}°, Roll={np.rad2deg(raw_obs[0][1]):.3f} Actions={action}")
+        print(f"Step {steps}: Height={height:.3f}, Pitch={pitch:.2f}°, Roll={np.rad2deg(raw_obs[0][1]):.3f}, Reward={reward}, Actions={action}")
         done = terminated[0]
     
     print(f"Episode {episode + 1} finished - Steps: {steps}, Total Reward: {total_reward:.4f}")

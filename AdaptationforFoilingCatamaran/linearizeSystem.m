@@ -35,7 +35,7 @@ end
 % B matrix (df/du)
 B = zeros(12, 5);
 control_defs = getControlDefinitions();
-for i = 1:8
+for i = 1:6
     foil_pert = foil;
     ctrl = control_defs{i};
     for j = 1:length(ctrl.foils)
@@ -44,7 +44,7 @@ for i = 1:8
         if axis_idx == 4
             foil_pert{foil_idx}.beta = foil_pert{foil_idx}.beta + delta_u;
         elseif axis_idx == 5
-            foil_pert{foil_idx}.beta = foil_pert{foil_idx}.twist + delta_u;
+            foil_pert{foil_idx}.twist = foil_pert{foil_idx}.twist + delta_u;
         else
             foil_pert{foil_idx}.attitudeInB(axis_idx) = foil{foil_idx}.attitudeInB(axis_idx) + delta_u;
         end
@@ -76,8 +76,8 @@ end
 function u_eq = extractControlAngles(foil)
 % Extract equilibrium control angles from foil structure
 u_eq = [
-    foil{1}.attitudeInB(3);
-    foil{1}.beta;  % L-foil rake (stbd)
+    % foil{1}.attitudeInB(3);
+    % foil{1}.beta;  % L-foil rake (stbd)
     foil{1}.twist;  % L-foil rake (stbd)
     foil{2}.attitudeInB(2);  % L-foil rake (stbd)
     foil{4}.attitudeInB(2);  % T-foil rake (stbd)
@@ -90,8 +90,8 @@ end
 function ctrl = getControlDefinitions()
 % Define which foils move with each control input
 ctrl = {
-    struct('foils', [1], 'axis', [3]) 
-    struct('foils', [1], 'axis', [4]) 
+    % struct('foils', [1], 'axis', [3]) 
+    % struct('foils', [1], 'axis', [4]) 
     struct('foils', [1], 'axis', [5]) 
     struct('foils', [2], 'axis', [2])  % L-foil rake (both parts)
     struct('foils', [4], 'axis', [2])        % T-foil rake (stbd)
