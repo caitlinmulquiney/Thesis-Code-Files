@@ -28,12 +28,11 @@ model = PPO(
     verbose=1,
     learning_rate=3e-4,
     n_steps=1024,
-    tensorboard_log="./ppo_hydrofoil_tensorboard/"
+    tensorboard_log="./ppo_hydrofoil_4dof_tensorboard/"
 )
 
 callback = stateLoggingCallback()
-model.learn(total_timesteps=200_000, callback=callback)
+model.learn(total_timesteps=60_000, callback=callback)
 
-model.save("ppo_hydrofoil_3dof_1")
-# model.save("sac_hydrofoil")
+model.save("ppo_hydrofoil_4dof_1")
 env.save("vecnormalize_stats.pkl")

@@ -11,7 +11,7 @@ eval_env = VecNormalize.load("vecnormalize_stats.pkl", eval_env)
 eval_env.training = False
 eval_env.norm_reward = False
 
-model = PPO.load("ppo_hydrofoil_3dof_1")
+model = PPO.load("ppo_hydrofoil_4dof_1")
 
 # Run evaluation episodes
 num_episodes = 5

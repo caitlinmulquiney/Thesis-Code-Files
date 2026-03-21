@@ -147,7 +147,8 @@ def foilLoad(eta, nu, foil, wind, wave):
     else:
         foilLoadInB = np.hstack((
             foilForceInB,
-            np.cross(foil["positionInB"] + np.random.uniform(-0.2, 0.2), foilForceInB)
+            np.cross(foil["positionInB"], foilForceInB)
+            #np.cross(foil["positionInB"] + np.random.uniform(-0.2, 0.2), foilForceInB)
         ))
 
     return foilLoadInB

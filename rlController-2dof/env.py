@@ -42,15 +42,15 @@ class HydrofoilEnv(gym.Env):
         )
 
         self.action_space = spaces.Box(
-            low=np.array([-1.0, -1.0, -1.0, -1.0, -1.0]),
-            high=np.array([1.0, 1.0, 1.0, 1.0, 1.0]),
+            low=np.array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0]),
+            high=np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]),
             dtype=np.float32
         )
 
-        self.last_action = np.zeros(5)
+        self.last_action = np.zeros(7)
 
     def reset(self, seed=None, options=None):
-        self.last_action = np.zeros(5)
+        self.last_action = np.zeros(7)
         state = self.sim.reset()
         return self._get_obs(state), {}
 
@@ -74,6 +74,7 @@ class HydrofoilEnv(gym.Env):
         height = state[2]
         pitch = state[4]
         roll = state[3]
+        yaw = state[5]
         roll_rate = state[9]
         pitch_rate = state[10]
 
@@ -89,10 +90,11 @@ class HydrofoilEnv(gym.Env):
         height_reward = 2-40.0 * height_error**2
         pitch_reward = 1-50 * pitch_error**2
         roll_reward = 1-50 * roll_error**2
+        yaw_reward = 1-50*yaw**2
         roll_rate_reward = 1-50*roll_rate_error**2
         saturation_penalty = -0.1 * np.sum(np.maximum(0, np.abs(action) - 0.8)**2)
 
-        reward = height_reward + pitch_reward + roll_reward + roll_rate_reward -0.1 * (height_error**2 + pitch_error**2 + roll_error**2) + saturation_penalty
+        reward = height_reward + pitch_reward + roll_reward + roll_rate_reward + yaw_reward -0.1 * (height_error**2 + pitch_error**2 + roll_error**2) + saturation_penalty
 
         terminated = False
         truncated = False
