@@ -32,7 +32,7 @@ model = PPO(
 )
 
 callback = stateLoggingCallback()
-model.learn(total_timesteps=60_000, callback=callback)
+model.learn(total_timesteps=100_000, callback=callback)
 
-model.save("ppo_hydrofoil_4dof_1")
-env.save("vecnormalize_stats.pkl")
+model.save("ppo_hydrofoil_4dof_2")
+env.save("vecnormalize_stats_4dof_2.pkl")

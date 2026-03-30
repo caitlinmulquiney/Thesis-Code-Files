@@ -1,6 +1,7 @@
 import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
+from Rbn import Rbn
 from simulator import HydrofoilSimulator
 
 
@@ -55,7 +56,7 @@ class HydrofoilEnv(gym.Env):
         return self._get_obs(state), {}
 
     def step(self, action):
-        state, sim_failed = self.sim.step(action)  # unpack both values
+        state, sim_failed, wind = self.sim.step(action)  # unpack both values
 
         if sim_failed:
             return self._get_obs(state), -10.0, True, False, {}
@@ -75,26 +76,53 @@ class HydrofoilEnv(gym.Env):
         pitch = state[4]
         roll = state[3]
         yaw = state[5]
+        x_velocity = state[6]
+        y_velocity = state[7]
         roll_rate = state[9]
         pitch_rate = state[10]
+        drift = np.arctan2(y_velocity, x_velocity)
 
+        #vel_body = np.array([x_velocity, y_velocity, 0])
+        #vel_ned = Rbn(state[0:6]) @ vel_body
+        #boat_speed = np.sqrt(vel_ned[0]**2 + vel_ned[1]**2)*1.944
+        boat_speed_knots = np.sqrt(x_velocity**2 + y_velocity**2) * 1.944
+        windVelocityInN = np.array([
+            wind["speedInN"] * np.cos(wind["direction"]),
+            wind["speedInN"] * np.sin(wind["direction"]),
+            0.0
+        ])
+        flowLinearVelocityInB = Rbn(state[0:6]).T @ windVelocityInN
+        twa = np.arctan2(flowLinearVelocityInB[1], flowLinearVelocityInB[0])
+        twa = - np.pi + wind["direction"]
+        vmg_knots = abs(boat_speed_knots * np.cos(twa))
+        target_vmg = -0.00000272*np.rad2deg(abs(twa))**4+0.001025*np.rad2deg(abs(twa))**3-0.12778*np.rad2deg(abs(twa))**2+6.012*np.rad2deg(abs(twa))-74
+        # print(boat_speed)
+        # print(wind["direction"])  
+        # print(twa)
+        print(vmg_knots)
+        print(target_vmg)
         target_height = -1.3 # permissable range from 0.1 to -2.5
         target_pitch = 0.5 * np.pi / 180 # permissable range -5/10 to 5/10 deg
         target_roll = -1 * np.pi / 180
+        target_drift = np.deg2rad(1)
     
+        drift_error = drift - target_drift
         height_error = height - target_height 
         roll_error = roll - target_roll
         pitch_error = pitch - target_pitch
         roll_rate_error = roll_rate
+        vmg_error = vmg_knots - target_vmg
 
         height_reward = 2-40.0 * height_error**2
         pitch_reward = 1-50 * pitch_error**2
         roll_reward = 1-50 * roll_error**2
-        yaw_reward = 1-50*yaw**2
+        drift_reward = 1-50*drift_error**2
         roll_rate_reward = 1-50*roll_rate_error**2
+        speed_reward = 1-0.5*vmg_error**2
         saturation_penalty = -0.1 * np.sum(np.maximum(0, np.abs(action) - 0.8)**2)
 
-        reward = height_reward + pitch_reward + roll_reward + roll_rate_reward + yaw_reward -0.1 * (height_error**2 + pitch_error**2 + roll_error**2) + saturation_penalty
+        #reward = height_reward + pitch_reward + roll_reward + roll_rate_reward + drift_reward -0.1 * (height_error**2 + pitch_error**2 + roll_error**2) + saturation_penalty
+        reward = height_reward + pitch_reward + roll_reward + roll_rate_reward + drift_reward + speed_reward -0.1 * (height_error**2 + pitch_error**2 + roll_error**2) + saturation_penalty
 
         terminated = False
         truncated = False

@@ -7,11 +7,11 @@ from stable_baselines3.common.vec_env import VecNormalize, DummyVecEnv
 
 # Load
 eval_env = DummyVecEnv([lambda: HydrofoilEnv()])
-eval_env = VecNormalize.load("vecnormalize_stats.pkl", eval_env)
+eval_env = VecNormalize.load("vecnormalize_stats_4dof_2.pkl", eval_env)
 eval_env.training = False
 eval_env.norm_reward = False
 
-model = PPO.load("ppo_hydrofoil_4dof_1")
+model = PPO.load("ppo_hydrofoil_4dof_2")
 
 # Run evaluation episodes
 num_episodes = 5
@@ -44,7 +44,8 @@ for episode in range(num_episodes):
         height = raw_obs[0][0]
         pitch = np.rad2deg(raw_obs[0][2])
 
-        print(f"Step {steps}: Height={height:.3f}, Pitch={pitch:.2f}°, Roll={np.rad2deg(raw_obs[0][1]):.3f}, Reward={reward}, Actions={action}")
+        #, Reward={reward}, Actions={action}
+        print(f"Step {steps}: Height={height:.3f}, Pitch={pitch:.2f}°, Roll={np.rad2deg(raw_obs[0][1]):.3f}, Yaw={np.rad2deg(raw_obs[0][3])}")
         done = terminated[0]
     
     print(f"Episode {episode + 1} finished - Steps: {steps}, Total Reward: {total_reward:.4f}")
