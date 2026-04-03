@@ -53,21 +53,22 @@ class HydrofoilSimulator:
         self.state = np.concatenate((eta0, nu0))
         self.foil_list = loadFoilDescription()  
 
-        self.state[2] += np.random.uniform(-0.2, 0.2)
-        self.state[3] += np.random.uniform(-0.02, 0.02)
-        self.state[4] += np.random.uniform(-0.02, 0.02)
-        self.state[5] += np.random.uniform(-0.02, 0.02)
+        self.state[2] += np.random.uniform(-0.05, 0.05)
+        self.state[3] += np.random.uniform(-0.05, 0.05)
+        self.state[4] += np.random.uniform(-0.05, 0.05)
+        self.state[5] += np.random.uniform(-0.05, 0.05)
         # self.boat_model.drawBoat(np.array([0,0,self.state[2],self.state[3], self.state[4], 0]), self.foil_list, wind)
         return self.state.copy()
 
     def get_wind(self):
-        if self.wind_speeds is None:
-            return {"speedInN": 9.231, "direction": 30 * np.pi / 180}
+        # if self.wind_speeds is None:
+        #     return {"speedInN": 9.231, "direction": 30 * np.pi / 180}
         
-        idx = self.wind_index % len(self.wind_speeds)
-        speed = self.wind_speeds[idx]-3
-        self.wind_index += 1
-        direction = np.random.uniform(45*np.pi/180, 75*np.pi/180)
+        # idx = self.wind_index % len(self.wind_speeds)
+        # speed = self.wind_speeds[idx]-3
+        # self.wind_index += 1
+        speed = 8.23 #np.random.uniform(5,10)
+        direction = 60*np.pi/180 #np.random.uniform(45*np.pi/180, 75*np.pi/180)
         
         return {"speedInN": speed, "direction": direction}
 
@@ -89,7 +90,7 @@ class HydrofoilSimulator:
 # ===============================
 # RK4 Integrator
 # ===============================
-def rk4_step(state, foil_list, dt, wind=None):
+def rk4_step(state, foil_list, dt, wind):
     k1 = system(foil_list, state, wind)
     k2 = system(foil_list, state + 0.5*dt*k1, wind)
     k3 = system(foil_list, state + 0.5*dt*k2, wind)

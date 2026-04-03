@@ -2,9 +2,6 @@ function [A, B, x_eq, u_eq] = linearizeSystem(eta0, nu0, wind, wave)
 % Linearize trimaran dynamics around equilibrium point
 % Outputs: A (12x12), B (12x5), x_eq (12x1), u_eq (5x1)
 
-wind.speedInN = 9.231;
-wind.direction = 30*pi/180;
-
 foil = loadFoilDescription;
 x_eq = [eta0; nu0];
 
@@ -33,9 +30,9 @@ for i = 1:6
 end
 
 % B matrix (df/du)
-B = zeros(12, 5);
+B = zeros(12, 7);
 control_defs = getControlDefinitions();
-for i = 1:6
+for i = 1:7
     foil_pert = foil;
     ctrl = control_defs{i};
     for j = 1:length(ctrl.foils)
@@ -57,46 +54,43 @@ end
 
 function F = systemDynamics(eta, nu, foil, wind, wave)
 % Compute state derivative
-
-totalLoad = zeros(6,1);
-for idxFoil = 1:length(foil)
-    totalLoad = totalLoad + foilLoad(eta, nu, foil{idxFoil}, wind, wave, false);
-end
-totalLoad = totalLoad + weightLoad(eta, false);
-totalLoad = totalLoad + aerodynamicLoadSuperstructure(eta, nu, wind, false);
-
-M = massDistribTrimaran(false);
-C = coriolisCentripetal(M, nu);
-nu_dot = M \ (totalLoad - C * nu);
-eta_dot = Jbn(eta) * nu;
-
-F = [eta_dot; nu_dot];
+    totalLoad = zeros(6,1);
+    for idxFoil = 1:length(foil)
+        totalLoad = totalLoad + foilLoad(eta, nu, foil{idxFoil}, wind, wave, false);
+    end
+    totalLoad = totalLoad + weightLoad(eta, false);
+    totalLoad = totalLoad + aerodynamicLoadSuperstructure(eta, nu, wind, false);
+    
+    M = massDistribTrimaran(false);
+    C = coriolisCentripetal(M, nu);
+    nu_dot = M \ (totalLoad - C * nu);
+    eta_dot = Jbn(eta) * nu;
+    
+    F = [eta_dot; nu_dot];
 end
 
 function u_eq = extractControlAngles(foil)
 % Extract equilibrium control angles from foil structure
-u_eq = [
-    % foil{1}.attitudeInB(3);
-    % foil{1}.beta;  % L-foil rake (stbd)
-    foil{1}.twist;  % L-foil rake (stbd)
-    foil{2}.attitudeInB(2);  % L-foil rake (stbd)
-    foil{4}.attitudeInB(2);  % T-foil rake (stbd)
-    foil{5}.attitudeInB(3);
-    foil{6}.attitudeInB(2);  % T-foil rake (port)
-    foil{7}.attitudeInB(3);
-];
+    u_eq = [
+        foil{1}.beta;
+        foil{1}.twist;
+        foil{2}.attitudeInB(2);
+        foil{4}.attitudeInB(2);
+        foil{5}.attitudeInB(3);
+        foil{6}.attitudeInB(2);
+        foil{7}.attitudeInB(3);
+    ];
 end
 
 function ctrl = getControlDefinitions()
 % Define which foils move with each control input
-ctrl = {
-    % struct('foils', [1], 'axis', [3]) 
-    % struct('foils', [1], 'axis', [4]) 
-    struct('foils', [1], 'axis', [5]) 
-    struct('foils', [2], 'axis', [2])  % L-foil rake (both parts)
-    struct('foils', [4], 'axis', [2])        % T-foil rake (stbd)
-    struct('foils', [5], 'axis', [3]) 
-    struct('foils', [6], 'axis', [2])        % T-foil rake (port)
-    struct('foils', [7], 'axis', [3]) 
-};
+    ctrl = {
+        struct('foils', [1], 'axis', [4]) 
+        struct('foils', [1], 'axis', [5]) 
+        struct('foils', [2], 'axis', [2])  % L-foil rake (both parts)
+        struct('foils', [4], 'axis', [2])        % T-foil rake (stbd)
+        struct('foils', [5], 'axis', [3]) 
+        struct('foils', [6], 'axis', [2])        % T-foil rake (port)
+        struct('foils', [7], 'axis', [3]) 
+    };
 end

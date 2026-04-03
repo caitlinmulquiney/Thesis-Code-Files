@@ -99,8 +99,8 @@ class HydrofoilEnv(gym.Env):
         # print(boat_speed)
         # print(wind["direction"])  
         # print(twa)
-        print(vmg_knots)
-        print(target_vmg)
+        # print(vmg_knots)
+        # print(target_vmg)
         target_height = -1.3 # permissable range from 0.1 to -2.5
         target_pitch = 0.5 * np.pi / 180 # permissable range -5/10 to 5/10 deg
         target_roll = -1 * np.pi / 180
@@ -111,18 +111,17 @@ class HydrofoilEnv(gym.Env):
         roll_error = roll - target_roll
         pitch_error = pitch - target_pitch
         roll_rate_error = roll_rate
-        vmg_error = vmg_knots - target_vmg
 
         height_reward = 2-40.0 * height_error**2
         pitch_reward = 1-50 * pitch_error**2
         roll_reward = 1-50 * roll_error**2
         drift_reward = 1-50*drift_error**2
+        yaw_reward = 1-50*yaw**2
         roll_rate_reward = 1-50*roll_rate_error**2
-        speed_reward = 1-0.5*vmg_error**2
         saturation_penalty = -0.1 * np.sum(np.maximum(0, np.abs(action) - 0.8)**2)
 
-        #reward = height_reward + pitch_reward + roll_reward + roll_rate_reward + drift_reward -0.1 * (height_error**2 + pitch_error**2 + roll_error**2) + saturation_penalty
-        reward = height_reward + pitch_reward + roll_reward + roll_rate_reward + drift_reward + speed_reward -0.1 * (height_error**2 + pitch_error**2 + roll_error**2) + saturation_penalty
+        reward = height_reward + pitch_reward + roll_reward + roll_rate_reward + drift_reward + yaw_reward
+        #reward = height_reward + pitch_reward + roll_reward + roll_rate_reward + drift_reward + speed_reward -0.1 * (height_error**2 + pitch_error**2 + roll_error**2) + saturation_penalty
 
         terminated = False
         truncated = False

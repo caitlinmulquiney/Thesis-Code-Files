@@ -34,12 +34,6 @@ def system(foil_list, state, wind=None, wave=None):
     eta = state[0:6]
     nu = state[6:12]
 
-    if wind is None:
-        wind = {
-            "speedInN": 9.231,
-            "direction": 30 * np.pi / 180
-        }
-
     if wave is None:
         wave = None
 
@@ -75,7 +69,7 @@ def update_foil_list(action):
     # action[1] = yaw control (foils 4, 6)
     if action is None:
         action = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-
+    # print(f"Action: {action}")
     pitchLfoil = action[0] * np.deg2rad(15.0)
     pitchTfoilP = action[1] * np.deg2rad(15.0)
     pitchTfoilS = action[2] * np.deg2rad(15.0)

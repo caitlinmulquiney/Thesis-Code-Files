@@ -9,12 +9,8 @@ nu0 = [Rbn(eta0).'* [U0*cos(beta0);U0*sin(beta0);0]; zeros(3,1)]; % boat velocit
 
 % Linearize
 [A, B, x_eq, u_eq] = linearizeSystem(eta0, nu0, wind, []);
-Q = diag([1 1 5000 1 1 50 1 1 500 1 1 1]);
-R = 10 * eye(size(B,2));
-R(1,:) = [100 -2 -2 -2 -2 -2];
-R(:,1) = [500; -2; -2; -2; -2; -2];
-R(2,:) = [0 10 0 0 -2 -2];
-R(:,2) = [0; 10; 0; 0; -2; -2];
+Q = diag([1, 1, 5000, 1, 1, 500, 1, 1, 500, 1, 1, 50]);
+R = diag([10 10 50 10 10 10 10]);
 [K,~,~] = lqr(A, B, Q, R);
 save('K.mat','K', 'A', 'B');
 % Check stability

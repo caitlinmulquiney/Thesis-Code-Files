@@ -38,10 +38,9 @@ plot(u(:,1),u(:,5));
 plot(u(:,1),u(:,6));
 plot(u(:,1),u(:,7));
 plot(u(:,1),u(:,8));
-plot(u(:,1),u(:,9));
 xlabel('Time $$ (sec)$$','Interpreter','Latex');
 title('Control Input (rad)','Interpreter','Latex');
 %h = legend('$$u(t)$$','$$v(t)$$','$$w(t)$$','$$p(t)$$','$$q(t)$$','$$r(t)$$');
-h = legend('Sail Sheet', 'Sail Beta', 'Sail Twist', 'L Foil','Starboard T Foil', 'Starboard Rudder', 'Port T Foil', 'Port Rudder');
+h = legend('Sail Beta', 'Sail Twist', 'L Foil','Starboard T Foil', 'Starboard Rudder', 'Port T Foil', 'Port Rudder');
 set(h,'Interpreter','latex')
 return

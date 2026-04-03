@@ -1,9 +1,10 @@
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize, VecMonitor
-from env import HydrofoilEnv
+from delayEnv import HydrofoilEnv
 from stable_baselines3.common.env_checker import check_env
 from stateLoggingCallback import stateLoggingCallback
 from stable_baselines3 import SAC
+import numpy as np
 
 
 env = DummyVecEnv([lambda: HydrofoilEnv()])
@@ -32,7 +33,6 @@ model = PPO(
 )
 
 callback = stateLoggingCallback()
-model.learn(total_timesteps=100_000, callback=callback)
-
-model.save("ppo_hydrofoil_4dof_2")
-env.save("vecnormalize_stats_4dof_2.pkl")
+model.learn(total_timesteps=150_000, callback=callback)
+model.save("ppo_hydrofoil_4dof_actuate_1")
+env.save("vecnormalize_stats_4dof_actuate_1.pkl")
