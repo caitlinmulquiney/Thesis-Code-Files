@@ -1,23 +1,17 @@
-function residual = computeResidual(x,eta,nu,foil,wind)
+function residual = computeResidual(u,eta,nu,foil,wind)
 % eta = [0;0;x(3);x(4);x(5);0];
 % nu = [[x(1)*cos(x(2));x(1)*sin(x(2));0]; zeros(3,1)];
 % % nu = [Rbn(eta).'* [x(1)*cos(x(2));x(1)*sin(x(2));0]; zeros(3,1)];
 % foil{1}.twist = foil{1}.twist + x(4);
 %foil{1}.beta = foil{1}.beta + x(4);
-% foil{1}.attitudeInB = foil{1}.attitudeInB + [0;0;x(6)];
-% Adjust L foil
-foil{2}.attitudeInB = foil{2}.attitudeInB + [0;x(1);0];
-foil{3}.attitudeInB = foil{3}.attitudeInB + [0;0;0];
-
-% Adjust Starboard T foil
-foil{4}.attitudeInB = foil{4}.attitudeInB + [0;x(2);0]; 
-% Adjust Starboard rudder
-foil{5}.attitudeInB = foil{5}.attitudeInB + [0;0;0]; 
-
-% Adjust Port T foil
-foil{6}.attitudeInB = foil{6}.attitudeInB + [0;x(3);0]; 
-% Adjust Port rudder
-foil{7}.attitudeInB = foil{7}.attitudeInB + [0;0;0]; 
+foil{1}.attitudeInB = foil{1}.attitudeInB + [0;0;u(8)];
+foil{1}.beta        = foil{1}.beta        + u(1);
+foil{1}.twist       = foil{1}.twist       + u(2);
+foil{2}.attitudeInB = foil{2}.attitudeInB + [0; u(3); 0];
+foil{4}.attitudeInB = foil{4}.attitudeInB + [0; u(4); 0];
+foil{5}.attitudeInB = foil{5}.attitudeInB + [0; 0;    u(5)];
+foil{6}.attitudeInB = foil{6}.attitudeInB + [0; u(6); 0];
+foil{7}.attitudeInB = foil{7}.attitudeInB + [0; 0;    u(7)];
 
 totalLoad = zeros(6,1);
 for idxFoil=1:length(foil)

@@ -1,4 +1,4 @@
-function plotErrorSignal(t, eta, nu, u)
+function plotErrorSignal(t, eta, nu, u, vmg, vmgE)
 subplot(1,3,1);
 hold on; grid on;
 %plot(t,eta(:,1));
@@ -15,8 +15,8 @@ set(h,'Interpreter','latex')
 
 subplot(1,3,2);
 hold on; grid on;
-%plot(t,nu(:,1));
-%plot(t,nu(:,2));
+% plot(t,nu(:,1));
+% plot(t,nu(:,2));
 plot(t,nu(:,3));
 plot(t,nu(:,4));
 plot(t,nu(:,5));
@@ -27,17 +27,28 @@ title('Velocity ($$m/s$$ or $$rad/s$$)','Interpreter','Latex');
 h = legend('$$w(t)$$','$$p(t)$$','$$q(t)$$','$$r(t)$$');
 set(h,'Interpreter','latex')
 
+% % 5 inputs
+% subplot(1,3,3);
+% hold on; grid on;
+% 
+% plot(u(:,1),u(:,2));
+% plot(u(:,1),u(:,3));
+% plot(u(:,1),u(:,4));
+% plot(u(:,1),u(:,5));
+% plot(u(:,1),u(:,6));
+% plot(u(:,1),u(:,7));
+% plot(u(:,1),u(:,8));
+% xlabel('Time $$ (sec)$$','Interpreter','Latex');
+% title('Control Input (rad)','Interpreter','Latex');
+% %h = legend('$$u(t)$$','$$v(t)$$','$$w(t)$$','$$p(t)$$','$$q(t)$$','$$r(t)$$');
+% h = legend('Sail Beta', 'Sail Twist', 'L Foil','Starboard T Foil', 'Starboard Rudder', 'Port T Foil', 'Port Rudder');
+% set(h,'Interpreter','latex')
 % 5 inputs
 subplot(1,3,3);
 hold on; grid on;
 
-plot(u(:,1),u(:,2));
-plot(u(:,1),u(:,3));
-plot(u(:,1),u(:,4));
-plot(u(:,1),u(:,5));
-plot(u(:,1),u(:,6));
-plot(u(:,1),u(:,7));
-plot(u(:,1),u(:,8));
+plot(vmg(:,1),vmg(:,2));
+plot(vmgE(:,1),vmgE(:,2));
 xlabel('Time $$ (sec)$$','Interpreter','Latex');
 title('Control Input (rad)','Interpreter','Latex');
 %h = legend('$$u(t)$$','$$v(t)$$','$$w(t)$$','$$p(t)$$','$$q(t)$$','$$r(t)$$');

@@ -11,6 +11,7 @@ from Jbn import Jbn
 from Tbn import Tbn
 from Rbn import Rbn                           # import Rbn from your file
 from model import Boat
+import math
 
 class HydrofoilSimulator:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
     def __init__(self, dt=0.05, wind_file = None):
@@ -21,8 +22,10 @@ class HydrofoilSimulator:
         """
         self.dt = dt
         self.wind_index = 0
+        self.wind = self.get_wind()
         self.state = None
         self.foil_list = loadFoilDescription()
+        self.foil_list_og = loadFoilDescription() 
         self.wind_index = 0
         self.steps = 0
         # self.boat_model = Boat()
@@ -38,11 +41,11 @@ class HydrofoilSimulator:
         """
         # self.steps = 0
         self.wind_index = 0
-        wind = self.get_wind()
+        self.wind = self.get_wind()
         U0 = 16.18  # Boat speed
         beta0 = 1.3 * np.pi / 180  # Boat drift angle
 
-        eta0 = np.array([0, 0, -1.2, 0.05, -0.025, 0.0])  # boat attitude
+        eta0 = np.array([0, 0, -1.3, 0.05, -0.025, 0.0])  # boat attitude
 
         vel_nav = np.array([U0 * np.cos(beta0),
                             U0 * np.sin(beta0),
@@ -52,11 +55,12 @@ class HydrofoilSimulator:
 
         self.state = np.concatenate((eta0, nu0))
         self.foil_list = loadFoilDescription()  
+        self.foil_list_og = loadFoilDescription() 
 
-        self.state[2] += np.random.uniform(-0.05, 0.05)
-        self.state[3] += np.random.uniform(-0.05, 0.05)
-        self.state[4] += np.random.uniform(-0.05, 0.05)
-        self.state[5] += np.random.uniform(-0.05, 0.05)
+        # self.state[2] += np.random.uniform(-0.2, 0.2)
+        # self.state[3] += np.random.uniform(-0.05, 0.05)
+        # self.state[4] += np.random.uniform(-0.05, 0.05)
+        # self.state[5] += np.random.uniform(-0.05, 0.05)
         # self.boat_model.drawBoat(np.array([0,0,self.state[2],self.state[3], self.state[4], 0]), self.foil_list, wind)
         return self.state.copy()
 
@@ -67,15 +71,21 @@ class HydrofoilSimulator:
         # idx = self.wind_index % len(self.wind_speeds)
         # speed = self.wind_speeds[idx]-3
         # self.wind_index += 1
-        speed = 8.23 #np.random.uniform(5,10)
-        direction = 60*np.pi/180 #np.random.uniform(45*np.pi/180, 75*np.pi/180)
         
+        speed = np.random.uniform(5,10) #
+        rng = np.random.default_rng()
+        # direction = (rng.choice(4, 1, p=[0.1, 0.1, 0.1, 0.7])+1)*30*np.pi/180 + np.random.uniform(0*np.pi/180, 30*np.pi/180)
+        direction = np.random.uniform(75*np.pi/180, 105*np.pi/180) #30*np.pi/180 + 1*np.pi/180*math.floor(self.steps/40) #np.random.uniform(30*np.pi/180, 150*np.pi/180) #
+        #     direction = 100*np.pi/180 + 1*np.pi/180*math.floor(self.steps-1600/40)
+        # print(direction*180/np.pi)
         return {"speedInN": speed, "direction": direction}
 
     def step(self, action):
-        self.foil_list = update_foil_list(action)
-        wind = self.get_wind()
-        result = rk4_step(self.state, self.foil_list, self.dt, wind=wind)
+        self.foil_list = update_foil_list(self.foil_list_og, action)
+        if (self.steps % 20 == 0):
+            self.wind = self.get_wind()
+            #self.foil_list_og = loadFoilDescription() 
+        result = rk4_step(self.state, self.foil_list, self.dt, wind=self.wind)
         
         if result is None:
             return self.state.copy(), True
@@ -83,8 +93,8 @@ class HydrofoilSimulator:
         self.state = result
         # if self.steps % 20 == 0: 
         #     self.boat_model.updateBoat(np.array([0,0,self.state[2],self.state[3], self.state[4], self.state[5]]), self.foil_list, wind)
-        # self.steps += 1
-        return self.state.copy(), False, wind
+        self.steps += 1
+        return self.state.copy(), False, self.wind
 
 
 # ===============================

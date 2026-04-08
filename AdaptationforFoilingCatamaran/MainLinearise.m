@@ -1,16 +1,16 @@
 clear all;
 close all;
-wind.speedInN = 9.231; % wind speed in m/s
-wind.direction = 37*pi/180; %(propagation direction, positive=wind from port side) 60deg= "-120" in classical terms
-U0 = 16.18; % boat speed
+wind.speedInN = 8.23; % wind speed in m/s
+wind.direction = 60*pi/180; %(propagation direction, positive=wind from port side) 60deg= "-120" in classical terms
+U0 = 18; % boat speed
 beta0 = 1.3*pi/180; % boat drift angle
 eta0 = [0;0;-1.3;2.6*pi/180;-0.5*pi/180;0*pi/180]; % boat attitude
 nu0 = [Rbn(eta0).'* [U0*cos(beta0);U0*sin(beta0);0]; zeros(3,1)]; % boat velocity in {b}
 
 % Linearize
 [A, B, x_eq, u_eq] = linearizeSystem(eta0, nu0, wind, []);
-Q = diag([1, 1, 5000, 1, 1, 500, 1, 1, 500, 1, 1, 50]);
-R = diag([10 10 50 10 10 10 10]);
+Q = diag([1, 1, 5000, 50, 50, 500, 1, 1, 500, 50, 50, 50]);
+R = diag([10 10 10 10 10 10 10]);
 [K,~,~] = lqr(A, B, Q, R);
 save('K.mat','K', 'A', 'B');
 % Check stability

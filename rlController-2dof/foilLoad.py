@@ -2,6 +2,7 @@ import numpy as np
 from Rbn import Rbn
 
 def foilLoad(eta, nu, foil, wind, wave):
+    off = np.random.uniform(-0.2, 0.2)
     """
     Inputs:
     - eta and nu (Fossen notation)

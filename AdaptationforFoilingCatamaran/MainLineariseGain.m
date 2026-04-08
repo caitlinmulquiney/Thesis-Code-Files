@@ -21,7 +21,7 @@ A_grid = cell(length(windSpeeds), length(windDirs));
 B_grid = cell(length(windSpeeds), length(windDirs));
 
 Q = diag([1, 1, 5000, 1, 1, 500, 1, 1, 500, 1, 1, 50]);
-R = diag([10 10 50 10 10 10 10]);
+R = diag([10 10 10 10 10 10 10]);
 
 % Compute LQR gain at each operating point
 for i = 1:length(windSpeeds)
@@ -99,21 +99,21 @@ fprintf('Mass matrix condition number: %.2e\n', cond_M);
 if any(eig_M < 0),  error('Mass matrix has negative eigenvalues'); end
 if cond_M > 1e6,    warning('Mass matrix is ill-conditioned');      end
 
-% --- Plot eigenvalues for all operating points ---
-figure; hold on;
-colors = lines(length(windSpeeds));
-for i = 1:length(windSpeeds)
-    for j = 1:length(windDirs)
-        if ~isempty(A_grid{i,j})
-            eigs_ij = eig(A_grid{i,j});
-            plot(real(eigs_ij), imag(eigs_ij), 'x', ...
-                 'Color', colors(i,:), 'MarkerSize', 10);
-        end
-    end
-end
-xline(0, 'k--', 'LineWidth', 2);
-grid on;
-xlabel('Real Part');
-ylabel('Imaginary Part');
-title('Eigenvalues Across Operating Points');
-legend(arrayfun(@(v) sprintf('%.0f m/s', v), windSpeeds, 'UniformOutput', false));
+% % --- Plot eigenvalues for all operating points ---
+% figure; hold on;
+% colors = lines(length(windSpeeds));
+% for i = 1:length(windSpeeds)
+%     for j = 1:length(windDirs)
+%         if ~isempty(A_grid{i,j})
+%             eigs_ij = eig(A_grid{i,j});
+%             plot(real(eigs_ij), imag(eigs_ij), 'x', ...
+%                  'Color', colors(i,:), 'MarkerSize', 10);
+%         end
+%     end
+% end
+% xline(0, 'k--', 'LineWidth', 2);
+% grid on;
+% xlabel('Real Part');
+% ylabel('Imaginary Part');
+% title('Eigenvalues Across Operating Points');
+% legend(arrayfun(@(v) sprintf('%.0f m/s', v), windSpeeds, 'UniformOutput', false));

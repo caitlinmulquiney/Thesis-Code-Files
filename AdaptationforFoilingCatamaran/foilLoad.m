@@ -1,4 +1,4 @@
-function foilLoadInB = foilLoad(eta,nu,foil,wind,wave,verbose)  %#ok<INUSL>
+function foilLoadInB = foilLoad(eta,nu,foil,wind,wave,off,verbose)  %#ok<INUSL>
 
 % Inputs: 
 % - eta and nu (following Fosen notations)
@@ -68,8 +68,8 @@ if strcmp(foil.type, 'sail')
         beta_deg = foil.beta * 180/pi;
         
         % Only works if beta is the same sign as aoa!
-        liftCoeff_i = 0.1*beta_deg + 1*tanh(0.09 * aoa_i);
-        dragCoeff_i = (0.0007+0.00001*(beta_deg)^2)*(aoa_i)^2;
+        liftCoeff_i = 0.1*beta_deg + 1*tanh(0.09 * aoa_i)+off;
+        dragCoeff_i = (0.0007+0.00001*(beta_deg)^2)*(aoa_i)^2+off/10;
     
         % Section lift and drag
         dL = 0.5 * rho_air * liftCoeff_i * foilRelativeSpeed^2 * foil.chord * ds;
@@ -82,8 +82,8 @@ if strcmp(foil.type, 'sail')
     lift = lift_total;
     drag = drag_total;
 else
-    liftCoeff = 1.5*tanh(0.09*aoa_deg);
-    dragCoeff = 6E-05*(aoa_deg)^2 + 5E-07*aoa_deg + 0.0051;
+    liftCoeff = 1.5*tanh(0.09*aoa_deg)+off;
+    dragCoeff = 6E-05*(aoa_deg)^2 + 5E-07*aoa_deg + 0.0051+off/10;
 
     % Free Surface Effect
     if strcmp(foil.type, "starboard T foil") || strcmp(foil.type, "port T foil") || strcmp(foil.type, "starboard L foil horizontal part")

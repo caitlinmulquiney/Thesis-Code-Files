@@ -59,7 +59,7 @@ def system(foil_list, state, wind=None, wave=None):
 
 
 
-def update_foil_list(action):
+def update_foil_list(foil_list, action):
     """
     Update foil list with new control inputs.
     """
@@ -78,7 +78,8 @@ def update_foil_list(action):
     twistSail = action[3] * np.deg2rad(10)
     pitchRudderS = action[5] * np.deg2rad(30)
 
-    foil_list = loadFoilDescription()  # Load the original foil list
+     # Load the original foil list
+    foil_list = loadFoilDescription() 
     for idx, foil in enumerate(foil_list):
         if idx == 0:
             # foil["attitudeInB"][2] = pitchSail

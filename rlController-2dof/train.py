@@ -5,12 +5,15 @@ from stable_baselines3.common.env_checker import check_env
 from stateLoggingCallback import stateLoggingCallback
 from stable_baselines3 import SAC
 import numpy as np
+from stable_baselines3.common.utils import get_linear_fn
+
+lr_schedule = get_linear_fn(3e-4, 1e-5, 1.0)
 
 
 env = DummyVecEnv([lambda: HydrofoilEnv()])
 env = VecMonitor(env, "./logs/hydrofoil_monitor")
 # 2. Wrap with VecNormalize
-env = VecNormalize(env, norm_obs=True, norm_reward=False)
+env = VecNormalize(env, norm_obs=True, norm_reward=True)
 # model = SAC(
 #     "MlpPolicy",
 #     env,
@@ -27,12 +30,12 @@ model = PPO(
     "MlpPolicy",
     env,
     verbose=1,
-    learning_rate=3e-4,
+    learning_rate=lr_schedule,
     n_steps=1024,
     tensorboard_log="./ppo_hydrofoil_4dof_tensorboard/"
 )
 
 callback = stateLoggingCallback()
 model.learn(total_timesteps=150_000, callback=callback)
-model.save("ppo_hydrofoil_4dof_actuate_1")
-env.save("vecnormalize_stats_4dof_actuate_1.pkl")
+model.save("ppo_hydrofoil_4dof_delay_prob")
+env.save("vecnormalize_stats_4dof_delay_prob.pkl")

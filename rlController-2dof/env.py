@@ -11,7 +11,8 @@ class HydrofoilEnv(gym.Env):
         super().__init__()
 
         self.sim = HydrofoilSimulator(dt=0.05,  wind_file="wind170528.txt")
-
+        self.vmg = 0
+        self.vmg_e = 0
         self.observation_space = spaces.Box(
             low=np.array([
                 # eta - position and orientation
@@ -53,10 +54,16 @@ class HydrofoilEnv(gym.Env):
     def reset(self, seed=None, options=None):
         self.last_action = np.zeros(7)
         state = self.sim.reset()
+        self.vmg = 0
+        self.vmg_e = 0
         return self._get_obs(state), {}
 
     def step(self, action):
-        state, sim_failed, wind = self.sim.step(action)  # unpack both values
+        delta = action - self.last_action
+        delta_clipped = np.clip(delta, -0.1, 0.1)
+        new_action = self.last_action + delta_clipped
+        state, sim_failed, wind = self.sim.step(new_action)  # unpack both values
+        self.last_action = new_action.copy()
 
         if sim_failed:
             return self._get_obs(state), -10.0, True, False, {}
@@ -94,8 +101,9 @@ class HydrofoilEnv(gym.Env):
         flowLinearVelocityInB = Rbn(state[0:6]).T @ windVelocityInN
         twa = np.arctan2(flowLinearVelocityInB[1], flowLinearVelocityInB[0])
         twa = - np.pi + wind["direction"]
-        vmg_knots = abs(boat_speed_knots * np.cos(twa))
+        self.vmg = abs(boat_speed_knots * np.cos(twa))
         target_vmg = -0.00000272*np.rad2deg(abs(twa))**4+0.001025*np.rad2deg(abs(twa))**3-0.12778*np.rad2deg(abs(twa))**2+6.012*np.rad2deg(abs(twa))-74
+        self.vmg_e = self.vmg-target_vmg
         # print(boat_speed)
         # print(wind["direction"])  
         # print(twa)
@@ -119,14 +127,13 @@ class HydrofoilEnv(gym.Env):
         yaw_reward = 1-50*yaw**2
         roll_rate_reward = 1-50*roll_rate_error**2
         saturation_penalty = -0.1 * np.sum(np.maximum(0, np.abs(action) - 0.8)**2)
+        gap_reward = -0.5 * np.sum(delta**2)
 
-        reward = height_reward + pitch_reward + roll_reward + roll_rate_reward + drift_reward + yaw_reward
+        reward = height_reward + pitch_reward + roll_reward + roll_rate_reward + drift_reward + yaw_reward + gap_reward
         #reward = height_reward + pitch_reward + roll_reward + roll_rate_reward + drift_reward + speed_reward -0.1 * (height_error**2 + pitch_error**2 + roll_error**2) + saturation_penalty
 
         terminated = False
         truncated = False
-
-        self.last_action = action.copy()
 
         if abs(pitch) > np.deg2rad(10):
             print(f"Pitch exceeds maximum value: {state[4]}")
